@@ -1,0 +1,9 @@
+{
+  "rules": {
+    ".read": "auth != null",  // Allow read access only to authenticated users
+    ".write": "auth != null", // Allow write access only to authenticated users
+    "yourDataNode": {
+      ".validate": "newData.child('userId').val() === auth.uid" // Example: Restrict write access based on the user's UID
+    }
+  }
+}
