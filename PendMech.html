@@ -4,18 +4,15 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
     <title>T.A.R. Dashboard</title>
+    
     <link rel="icon" href="images/icon_logo.png" type="image/x-icon" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    />
-    <script
-      src="https://kit.fontawesome.com/6f40c2c1f0.js"
-      crossorigin="anonymous"
-      defer
-    ></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/PendApp.css" />
+
+    <script src="https://kit.fontawesome.com/6f40c2c1f0.js" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </head>
 
   <body>
@@ -56,6 +53,8 @@
                 </a>
               </li>
 
+              <hr />
+
               <!--Approved-->
               <li class="sidebar-header">Approved</li>
               <li class="sidebar-item">
@@ -77,20 +76,22 @@
                 </a>
               </li>
 
+              <hr />
+
               <!--Reports-->
               <li class="sidebar-link">
-                <b href="Reports.html" class="sidebar-link">
+                <a href="Reports.html" class="sidebar-link">
                   <i class="fa-solid fa-file-pen"></i>
                   Reports
-                </b>
+                </a>
               </li>
 
               <!--Log Out-->
               <li class="sidebar-link">
-                <b href="#" class="sidebar-link">
+                <a href="#" onClick="signout()" class="sidebar-link">
                   <i class="fa-solid fa-right-from-bracket"></i>
                   Log-Out
-                </b>
+                </a>
               </li>
             </ul>
           </div>
@@ -112,7 +113,7 @@
 
             <!--Data Table-->
             <div class="card border-0">
-              <!-- <div class="card-header">
+              <!--<div class="card-header">
                                 <h5 class="card-title">
                                     Basic Table
                                 </h5>
@@ -123,16 +124,12 @@
               <div class="card-body">
                 <table class="table">
                   <thead
-                    class="table-dark table-bordered align-items-center mb-0"
-                  >
-                    <tr
-                      class="text-uppercase text-nonwrap text-xxs font-weight-bolder ps-2"
-                    >
+                    class="table-dark table-bordered align-items-center mb-0">
+                    <tr class="text-uppercase text-nonwrap text-xxs font-weight-bolder ps-2">
                       <th>Full Name</th>
                       <th>E-Mail</th>
                       <th>Number</th>
                       <th>E-Mail Status</th>
-                      <th>Request</th>
                       <th>Document</th>
                       <th>Reject</th>
                       <th>Approve</th>
@@ -147,9 +144,6 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/PCustomers.js"></script>
-
     <!--Collapsible Button for Sidebar-->
     <script>
       const sidebarToggle = document.querySelector("#sidebar-toggle");
@@ -159,6 +153,11 @@
     </script>
 
     <!--Separate JavaScript File Connection for Firebase-->
-    <script src="js/config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+
+    <!--Separate JavaScript File Connection for Firebase-->
+    <script src="js/mainContent.js"></script>
   </body>
 </html>

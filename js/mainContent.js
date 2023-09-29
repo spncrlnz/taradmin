@@ -19,3 +19,12 @@ dataRef.on("value", (snapshot) => {
   let data = snapshot.val();
   console.log(data);
 });
+
+//SignOut Button
+function signout() {
+  firebase.auth().signOut().then(() => {
+      window.location.href = "index.html";
+  }).catch((error) => {
+      alert(error)
+  });
+}

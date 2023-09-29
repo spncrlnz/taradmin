@@ -6,7 +6,7 @@ const firebaseConfig = {
   storageBucket: "tapandrepair-online-cace3.appspot.com",
   messagingSenderId: "101753671107",
   appId: "1:101753671107:web:d38750e9c981de44364176",
-  measurementId: "G-YNQ5V3JNEL",
+  measurementId: "G-YNQ5V3JNEL"
 };
 
 firebase.initializeApp(firebaseConfig);
