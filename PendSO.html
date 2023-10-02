@@ -16,6 +16,7 @@
   </head>
 
   <body>
+    <div class="pageContainer" id="pageContainer">
     <div class="wrapper">
       <!--SideBar Contents-->
       <aside id="sidebar">
@@ -139,7 +140,7 @@
                       <th>Approve</th>
                     </tr>
                   </thead>
-                  <tbody class="table-cotent"></tbody>
+                  <tbody class="table-cotent" id="table-content">
                 </table>
               </div>
             </div>
@@ -147,6 +148,7 @@
         </main>
       </div>
     </div>
+  </div>
 
     <!--Collapsible Button for Sidebar-->
     <script>
@@ -163,5 +165,8 @@
 
     <!--Separate JavaScript File Connection for Firebase-->
     <script src="js/mainContent.js"></script>
+    <script>
+      dataQuery = "PendSO";
+    </script>
   </body>
 </html>

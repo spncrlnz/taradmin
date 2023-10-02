@@ -9,12 +9,10 @@
 
     <link rel="icon" href="images/icon_logo.png" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="sweetalert2.min.css" />
     <link rel="stylesheet" href="css/PendApp.css" />
 
     <script src="https://kit.fontawesome.com/6f40c2c1f0.js" crossorigin="anonymous" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="sweetalert2.min.js"></script>
   </head>
 
   <body>
@@ -125,7 +123,8 @@
                       <th>Approve</th>
                     </tr>
                   </thead>
-                  <tbody class="table-cotent"></tbody>
+                  <tbody class="table-cotent" id="table-content">
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -165,126 +164,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
 
-    <!--Sweet Alert JavaScript Link-->
-    <script src="sweetalert2.min.js"></script>
-
     <!--Separate JavaScript File Connection for Firebase-->
     <script src="js/mainContent.js"></script>
-
     <script>
-      var db = firebase.database();
-      $(document).ready(function(){
-        getData();
-      });
-
-      function getData(){
-        dbref.ref("users").orderByChild("usertype").equalTo("Customer").on('value', function(snapshot){
-          if (snapshot.exists()) {
-            var content = '';
-            $('#table-content').empty();
-            snapshot.forEach(function (data){
-              var val = data.val();
-              if (val.verify == 0) {
-                content += `<tr>`;
-                  if (val.fullname) {
-                    content += '<td class = "text-nonwrap">' + val.fullname + '</td>';
-                  } else {
-                    content += '<td> - </td>';
-                  }
-
-                  if (val.email) {
-                    content += '<td class = "text-nonwrap">' + val.email + '</td>';
-                  } else {
-                    content += '<td> - </td>';
-                  }
-                  
-                  if (val.contactnumber) {
-                    content += '<td class = "text-nonwrap">' + val.contactnumber + '</td>';
-                  } else {
-                    content += '<td> - </td>';
-                  }
-
-                  if (val.verify == true) {
-                    content += `
-                    <td> 
-                      <button class = "btn btn-primary btn-block" onclick = "openDocument('${val.uid}')"> View </button>
-                    </td>
-                    <td class = "text-center">
-                      <span class = "badge rounded-pill text-bg-success"> Verified </span>
-                    </td>
-                    <td>
-                     <button class = "btn btn-danger btn-block" onclick = "userStatusUpdate('${val.uid}', 'false')"> Reject </button>
-                    </td>
-                    <td>
-                      <button class = "btn btn-success btn-block" onclick = "userStatusUpdate('${val.uid}', 'true')"> Aprrove </button>
-                    </td>`;
-                  } else if (val.verify == false) {
-                    content += `
-                    <td>
-                      <button class = "btn btn-primary btn-block" onclick = "openDocument('${val.uid}')"> View </button>
-                    </td>
-                    <td class = "text-center">
-                      <span class = "rounded-pill text-bg-danger"> Not Verified </span>
-                    </td>
-                    <td>
-                      <button class = "btn btn-danger btn-block" onclick = "userStatusUpdate('${val.uid}', 'false')"> Reject </button>
-                    </td>
-                    <td>
-                      <button class = "btn btn-danger btn-block" onclick = "userStatusUpdate('${val.uid}', 'false')"> Reject </button>
-                    </td>`;
-                  }
-                  content += '</tr>';
-              }
-            })
-            $('#table-content').append(content);
-            $("#table-content").each(function (elem, index) {
-              var arr = $.makeArray($("tr", this).detach());
-              arr.reverse();
-              $(this).append(arr);
-            })
-          }
-          checkTable();
-        })
-      };
-
-      function checkTable(){
-        let table = document.getElementById("table-content");
-        if (table.row.length == 0) {
-          $('#table-content').empty();
-          $('#table-content').append('<h6 class = "text-danger mt-5 text-nonwrap"> No Data Found </h6>');
-        }
-      }
-
-      async function openDocument(uid){
-        $("#docs").empty();
-          Swal.fire({
-            icon: 'info',
-            title: 'Warning! The document you are about to view is Confidential. Make sure it is Secure and only used for System User Authentication.',
-            showDenyButton: false,
-            showCancelButton: true,
-            confirmButtonText: 'Okay',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              db.ref("users").child(uid).once("value", function (s) {
-                var val = s.val();
-                var content = ``;
-
-                if (val.usertype == "customer") {
-                  content += `
-                  <h4> Valid ID </h4>
-                  <img src = "${val.profilePictureUrl}" alt = "" class = "img-fluid border" style = "width: 100%; max-height: auto;">`;
-                } else {
-                  content += `
-                  <h4> Valid ID </h4>
-                  <img src = "${val.profilePictureUrl}" alt = "" class = "img-fluid border" style = "width: 100%; max-height: auto;">`;
-                }
-              })
-            }
-            $("#docs").append(content);
-            $("#modalDocument").modal("show");
-          })
-      }
-
+      dataQuery = "PendCust"
     </script>
+
   </body>
 </html>
