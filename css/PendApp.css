@@ -4,6 +4,29 @@
   grid-area: overlap;
 }
 
+.confirmationContainer {
+  grid-area: overlap;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+}
+
+.confirmationBackground {
+  background-color: white;
+  padding: 20px;
+  height: fit-content;
+  width: fit-content;
+  border-radius: 10px;
+}
+
+.confirmationButtonContainer {
+  display: flex;
+  justify-content: space-around;
+}
+
 .mapContainer {
   grid-area: overlap;
   height: 100vh;
@@ -20,7 +43,6 @@
   width: fit-content;
   border-radius: 10px;
 }
-
 .mapClose {
   background-color: blue;
   width: 100%;

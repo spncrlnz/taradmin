@@ -98,11 +98,86 @@ let viewLocation = (index) => {
   mapContents.appendChild(locationHTMLString);
 };
 
-let createRow = (rowObject, index) => {
+let removeConfirmationForm = () => {
+  let confirmationForm = document.getElementById("confirmationContainer");
+  confirmationForm.remove();
+};
+
+let confirmationForm = (action, userIdRef, index) => {
+  let confirmationText = document.createTextNode(
+    "Are you sure you want to " + action + " the user?"
+  );
+  let pageContainer = document.getElementById("pageContainer");
+  let confirmationContainer = document.createElement("div");
+  let confirmationBackground = document.createElement("div");
+  let confirmationContents = document.createElement("div");
+  let confirmationButtonContainer = document.createElement("div");
+  let confirmationButtonConfirm = document.createElement("div");
+  let confirmationButtonCancel = document.createElement("div");
+  let confirmText = document.createTextNode("CONFIRM");
+  let cancelText = document.createTextNode("CANCEL");
+  confirmationContainer.setAttribute("class", "confirmationContainer");
+  confirmationContainer.setAttribute("id", "confirmationContainer");
+  confirmationContainer.setAttribute("style", "z-index: 99");
+  confirmationBackground.setAttribute("class", "confirmationBackground");
+  confirmationContents.setAttribute("class", "confirmationContents");
+  confirmationContents.setAttribute("id", "confirmationContents");
+  confirmationContents.setAttribute("style", "margin: 10px;");
+  pageContainer.appendChild(confirmationContainer);
+  confirmationContainer.appendChild(confirmationBackground);
+  confirmationBackground.appendChild(confirmationContents);
+  confirmationContents.appendChild(confirmationText);
+  confirmationBackground.appendChild(confirmationButtonContainer);
+  confirmationButtonContainer.appendChild(confirmationButtonCancel);
+  confirmationButtonContainer.appendChild(confirmationButtonConfirm);
+  confirmationButtonContainer.setAttribute(
+    "class",
+    "confirmationButtonContainer"
+  );
+  confirmationButtonContainer.setAttribute("style", "margin: 10px;");
+  confirmationButtonCancel.appendChild(cancelText);
+  confirmationButtonCancel.setAttribute("style", "cursor: pointer;");
+  confirmationButtonCancel.setAttribute("onclick", "removeConfirmationForm()");
+  confirmationButtonConfirm.appendChild(confirmText);
+  confirmationButtonConfirm.setAttribute("style", "cursor: pointer;");
+  if (action == "approve") {
+    confirmationButtonConfirm.setAttribute(
+      "onclick",
+      'approveData("' + userIdRef + '", ' + index + ")"
+    );
+  }
+  if (action == "remove") {
+    confirmationButtonConfirm.setAttribute(
+      "onclick",
+      'removeData("' + userIdRef + '", ' + index + ")"
+    );
+  }
+};
+
+let removeData = (userIdRef, index) => {
+  userIdRef = "users/" + userIdRef;
+  userIdRef = database.ref(userIdRef);
+  userIdRef.remove();
+  let rowItem = document.getElementById("row" + index);
+  rowItem.remove();
+  removeConfirmationForm();
+};
+
+let approveData = (userIdRef, index) => {
+  userIdRef = "users/" + userIdRef + "/approved";
+  userIdRef = database.ref(userIdRef);
+  userIdRef.set(true);
+  let rowItem = document.getElementById("row" + index);
+  rowItem.remove();
+  removeConfirmationForm();
+};
+
+let createRow = (rowObject, index, userId) => {
   // FullName > Email > Number > Email-Status > Document > Reject > Approve
   userObject = rowObject;
   let parent = document.getElementById("table-content");
   let row = document.createElement("tr");
+  row.setAttribute("id", "row" + index);
   let fullNameData = document.createTextNode(userObject.fullname);
   let emailData = document.createTextNode(userObject.email);
   let numberData = document.createTextNode(userObject.contactnumber);
@@ -120,8 +195,20 @@ let createRow = (rowObject, index) => {
   let terminateData = document.createTextNode("TERMINATE");
   let locationData = document.createTextNode("LOCATION");
   approveButton.appendChild(approveData);
+  approveButton.setAttribute(
+    "onclick",
+    'confirmationForm("approve","' + userId + '",' + index + ")"
+  );
   rejectButton.appendChild(rejectData);
+  rejectButton.setAttribute(
+    "onclick",
+    'confirmationForm("remove","' + userId + '",' + index + ")"
+  );
   terminateButton.appendChild(terminateData);
+  terminateButton.setAttribute(
+    "onclick",
+    'confirmationForm("remove","' + userId + '",' + index + ")"
+  );
   locationButton.appendChild(locationData);
   locationButton.setAttribute("key", index);
   locationButton.setAttribute("onclick", "viewLocation(" + index + ")");
@@ -190,29 +277,39 @@ retrieveData().then(() => {
   if (dataChildren) {
     dataChildren.forEach((obj, index) => {
       // Your code to create and append table rows goes here
+      let userEmail = obj.email;
+      let userId;
+      dataRef
+        .orderByChild("email")
+        .equalTo(userEmail)
+        .on("value", (snapshot) => {
+          snapshot.forEach((child) => {
+            userId = child.key;
+          });
+        });
       if (dataQuery == "PendCust") {
         if (obj.usertype == "Customer" && obj.approved == false)
-          createRow(obj, index);
+          createRow(obj, index, userId);
       }
       if (dataQuery == "ApprCust") {
         if (obj.usertype == "Customer" && obj.approved == true)
-          createRow(obj, index);
+          createRow(obj, index, userId);
       }
       if (dataQuery == "PendMech") {
         if (obj.usertype == "Mechanic" && obj.approved == false)
-          createRow(obj, index);
+          createRow(obj, index, userId);
       }
       if (dataQuery == "ApprMech") {
         if (obj.usertype == "Mechanic" && obj.approved == true)
-          createRow(obj, index);
+          createRow(obj, index, userId);
       }
       if (dataQuery == "PendSO") {
         if (obj.usertype == "Repair Shop" && obj.approved == false)
-          createRow(obj, index);
+          createRow(obj, index, userId);
       }
       if (dataQuery == "ApprSO") {
         if (obj.usertype == "Repair Shop" && obj.approved == true)
-          createRow(obj, index);
+          createRow(obj, index, userId);
       }
     });
   } else {
