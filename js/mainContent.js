@@ -10,9 +10,9 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
 let database = firebase.database();
 let dataRef = database.ref("users");
+
 let data;
 let dataChildren = [];
 let dataQuery;
@@ -63,20 +63,23 @@ let closeMap = () => {
 
 let viewLocation = (index) => {
   let pageContainer = document.getElementById("pageContainer");
+
   let mapContainer = document.createElement("div");
   let mapBackground = document.createElement("div");
   let mapContents = document.createElement("div");
+  let locationHTMLString = document.createElement("iframe");
+  let mapClose = document.createElement("div");
+
+  let mapCloseText = document.createTextNode("CLOSE");
+
   mapContainer.setAttribute("class", "mapContainer");
   mapContainer.setAttribute("id", "mapContainer");
   mapContainer.setAttribute("style", "z-index: 99");
   mapBackground.setAttribute("class", "mapBackground");
   mapContents.setAttribute("id", "mapContents");
   mapContents.setAttribute("class", "mapContents");
-  let locationHTMLString = document.createElement("iframe");
-  let mapClose = document.createElement("div");
   mapClose.setAttribute("class", "mapClose");
   mapClose.setAttribute("onclick", "closeMap()");
-  let mapCloseText = document.createTextNode("CLOSE");
   locationHTMLString.setAttribute(
     "src",
     "https://maps.google.com/maps?q=" +
@@ -90,6 +93,7 @@ let viewLocation = (index) => {
   locationHTMLString.setAttribute("frameborder", "0");
   locationHTMLString.setAttribute("style", "border:0;");
   locationHTMLString.setAttribute("allowfullscreen", "");
+
   pageContainer.appendChild(mapContainer);
   mapContainer.appendChild(mapBackground);
   mapBackground.appendChild(mapContents);
@@ -116,13 +120,7 @@ let confirmationForm = (action, userIdRef, index) => {
   let confirmationButtonCancel = document.createElement("div");
   let confirmText = document.createTextNode("CONFIRM");
   let cancelText = document.createTextNode("CANCEL");
-  confirmationContainer.setAttribute("class", "confirmationContainer");
-  confirmationContainer.setAttribute("id", "confirmationContainer");
-  confirmationContainer.setAttribute("style", "z-index: 99");
-  confirmationBackground.setAttribute("class", "confirmationBackground");
-  confirmationContents.setAttribute("class", "confirmationContents");
-  confirmationContents.setAttribute("id", "confirmationContents");
-  confirmationContents.setAttribute("style", "margin: 10px;");
+
   pageContainer.appendChild(confirmationContainer);
   confirmationContainer.appendChild(confirmationBackground);
   confirmationBackground.appendChild(confirmationContents);
@@ -130,16 +128,25 @@ let confirmationForm = (action, userIdRef, index) => {
   confirmationBackground.appendChild(confirmationButtonContainer);
   confirmationButtonContainer.appendChild(confirmationButtonCancel);
   confirmationButtonContainer.appendChild(confirmationButtonConfirm);
+  confirmationButtonCancel.appendChild(cancelText);
+  confirmationButtonConfirm.appendChild(confirmText);
+
+  confirmationContainer.setAttribute("class", "confirmationContainer");
+  confirmationContainer.setAttribute("id", "confirmationContainer");
+  confirmationContainer.setAttribute("style", "z-index: 99");
+  confirmationBackground.setAttribute("class", "confirmationBackground");
+  confirmationContents.setAttribute("class", "confirmationContents");
+  confirmationContents.setAttribute("id", "confirmationContents");
+  confirmationContents.setAttribute("style", "margin: 10px;");
   confirmationButtonContainer.setAttribute(
     "class",
     "confirmationButtonContainer"
   );
   confirmationButtonContainer.setAttribute("style", "margin: 10px;");
-  confirmationButtonCancel.appendChild(cancelText);
   confirmationButtonCancel.setAttribute("style", "cursor: pointer;");
   confirmationButtonCancel.setAttribute("onclick", "removeConfirmationForm()");
-  confirmationButtonConfirm.appendChild(confirmText);
   confirmationButtonConfirm.setAttribute("style", "cursor: pointer;");
+
   if (action == "approve") {
     confirmationButtonConfirm.setAttribute(
       "onclick",
@@ -158,8 +165,10 @@ let removeData = (userIdRef, index) => {
   userIdRef = "users/" + userIdRef;
   userIdRef = database.ref(userIdRef);
   userIdRef.remove();
+
   let rowItem = document.getElementById("row" + index);
   rowItem.remove();
+
   removeConfirmationForm();
 };
 
@@ -167,59 +176,75 @@ let approveData = (userIdRef, index) => {
   userIdRef = "users/" + userIdRef + "/approved";
   userIdRef = database.ref(userIdRef);
   userIdRef.set(true);
+
   let rowItem = document.getElementById("row" + index);
   rowItem.remove();
+
   removeConfirmationForm();
 };
 
 let createRow = (rowObject, index, userId) => {
   // FullName > Email > Number > Email-Status > Document > Reject > Approve
   userObject = rowObject;
+
   let parent = document.getElementById("table-content");
+
   let row = document.createElement("tr");
-  row.setAttribute("id", "row" + index);
-  let fullNameData = document.createTextNode(userObject.fullname);
-  let emailData = document.createTextNode(userObject.email);
-  let numberData = document.createTextNode(userObject.contactnumber);
-  let emailStatusData = document.createTextNode(userObject.verified);
-  let documentData = document.createTextNode(userObject.profilePictureUrl);
   let blankData = document.createTextNode("N/A");
   let trueData = document.createTextNode("Verified");
   let falseData = document.createTextNode("Not Verified");
+  let documentButton = document.createElement("a");
+  let documentContent = document.createElement("button");
   let approveButton = document.createElement("button");
   let rejectButton = document.createElement("button");
   let terminateButton = document.createElement("button");
   let locationButton = document.createElement("button");
+
+  let fullNameData = document.createTextNode(userObject.fullname);
+  let emailData = document.createTextNode(userObject.email);
+  let numberData = document.createTextNode(userObject.contactnumber);
+  let emailStatusData = document.createTextNode(userObject.verified);
+  let documentUrl = userObject.profilePictureUrl;
+  let documentData = document.createTextNode("VIEW");
   let approveData = document.createTextNode("APPROVE");
   let rejectData = document.createTextNode("REJECT");
   let terminateData = document.createTextNode("TERMINATE");
   let locationData = document.createTextNode("LOCATION");
+
+  documentButton.appendChild(documentContent);
+  documentContent.appendChild(documentData);
   approveButton.appendChild(approveData);
+  rejectButton.appendChild(rejectData);
+  terminateButton.appendChild(terminateData);
+  locationButton.appendChild(locationData);
+
+  row.setAttribute("id", "row" + index);
+  documentButton.setAttribute("href", documentUrl);
+  documentButton.setAttribute("target", "_blank");
   approveButton.setAttribute(
     "onclick",
     'confirmationForm("approve","' + userId + '",' + index + ")"
   );
-  rejectButton.appendChild(rejectData);
   rejectButton.setAttribute(
     "onclick",
     'confirmationForm("remove","' + userId + '",' + index + ")"
   );
-  terminateButton.appendChild(terminateData);
   terminateButton.setAttribute(
     "onclick",
     'confirmationForm("remove","' + userId + '",' + index + ")"
   );
-  locationButton.appendChild(locationData);
   locationButton.setAttribute("key", index);
   locationButton.setAttribute("onclick", "viewLocation(" + index + ")");
+
   let dataArray = [];
+
   if (dataQuery == "PendCust" || dataQuery == "PendMech") {
     dataArray = [
       fullNameData,
       emailData,
       numberData,
       emailStatusData,
-      documentData,
+      documentButton,
       rejectButton,
       approveButton,
     ];
@@ -230,7 +255,7 @@ let createRow = (rowObject, index, userId) => {
       emailData,
       numberData,
       emailStatusData,
-      documentData,
+      documentButton,
       terminateButton,
     ];
   }
@@ -240,7 +265,7 @@ let createRow = (rowObject, index, userId) => {
       emailData,
       numberData,
       emailStatusData,
-      documentData,
+      documentButton,
       locationButton,
       rejectButton,
       approveButton,
@@ -252,11 +277,12 @@ let createRow = (rowObject, index, userId) => {
       emailData,
       numberData,
       emailStatusData,
-      documentData,
+      documentButton,
       locationButton,
       terminateButton,
     ];
   }
+
   for (let i = 0; i < dataArray.length; i++) {
     let item = document.createElement("th");
     if (dataArray[i].nodeValue != "undefined") {
@@ -277,8 +303,10 @@ retrieveData().then(() => {
   if (dataChildren) {
     dataChildren.forEach((obj, index) => {
       // Your code to create and append table rows goes here
+
       let userEmail = obj.email;
       let userId;
+
       dataRef
         .orderByChild("email")
         .equalTo(userEmail)
@@ -287,6 +315,7 @@ retrieveData().then(() => {
             userId = child.key;
           });
         });
+
       if (dataQuery == "PendCust") {
         if (obj.usertype == "Customer" && obj.approved == false)
           createRow(obj, index, userId);
