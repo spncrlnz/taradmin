@@ -230,11 +230,13 @@ let removeData = async (userIdRef, index) => {
 
 let approveData = async (userIdRef, index) => {
   try {
+    let userEmailRef = "users/" + userIdRef;
+    userEmailRef = database.ref(userEmailRef);
     userIdRef = "users/" + userIdRef + "/approved";
     userIdRef = database.ref(userIdRef);
 
     // Use an async function to await the data retrieval
-    const snapshot = await userIdRef.once("value");
+    const snapshot = await userEmailRef.once("value");
     const user = snapshot.val();
     const userEmail = user.email;
 
