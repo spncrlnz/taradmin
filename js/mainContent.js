@@ -161,26 +161,219 @@ let confirmationForm = (action, userIdRef, index) => {
   }
 };
 
-let removeData = (userIdRef, index) => {
-  userIdRef = "users/" + userIdRef;
-  userIdRef = database.ref(userIdRef);
-  userIdRef.remove();
+let sendEmailNotification = (userEmail, actionTaken) => {
+  //UN: tapandrepairtar@gmail.com
+  //PW: TARTARus;
+  //Public Key : _WBdXTRXKLOJVxBJr
+  (function () {
+    emailjs.init("_WBdXTRXKLOJVxBJr");
+  })();
 
-  let rowItem = document.getElementById("row" + index);
-  rowItem.remove();
+  let emailParams = {
+    To: userEmail,
+    Subject: "Your Account has been " + actionTaken,
+    Body:
+      "CONGRATULATIONS, Your Account " +
+      userEmail +
+      " has been " +
+      actionTaken +
+      ".",
+  };
 
-  removeConfirmationForm();
+  let serviceId = "service_ghy4wru";
+  let templateId = "template_gfwlr6n";
+
+  emailjs
+    .send(serviceId, templateId, emailParams)
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((res) => {
+      console.error(res);
+    });
 };
 
-let approveData = (userIdRef, index) => {
-  userIdRef = "users/" + userIdRef + "/approved";
-  userIdRef = database.ref(userIdRef);
-  userIdRef.set(true);
+/*return new Promise((resolve) => {
+  dataRef.on("value", (snapshot) => {
+    data = snapshot.val();
+    if (data) {
+      dataChildren = Object.values(data);
+    } else {
+      dataChildren = []; // Initialize dataChildren as an empty array if data is null
+    }
+    resolve();
+  });
+});*/
 
-  let rowItem = document.getElementById("row" + index);
-  rowItem.remove();
+let removeData = async (userIdRef, index) => {
+  try {
+    userIdRef = "users/" + userIdRef;
+    userIdRef = database.ref(userIdRef);
 
-  removeConfirmationForm();
+    // Use an async function to await the data retrieval
+    const snapshot = await userIdRef.once("value");
+    const user = snapshot.val();
+    const userEmail = user.email;
+
+    // Perform the email notification, data removal, and other operations
+    sendEmailNotification(userEmail, "REJECTED");
+    await userIdRef.remove();
+
+    let rowItem = document.getElementById("row" + index);
+    rowItem.remove();
+
+    removeConfirmationForm();
+  } catch (error) {
+    console.error("Error removing data:", error);
+  }
+};
+
+let approveData = async (userIdRef, index) => {
+  try {
+    userIdRef = "users/" + userIdRef + "/approved";
+    userIdRef = database.ref(userIdRef);
+
+    // Use an async function to await the data retrieval
+    const snapshot = await userIdRef.once("value");
+    const user = snapshot.val();
+    const userEmail = user.email;
+
+    // Perform the email notification, data approval, and other operations
+    sendEmailNotification(userEmail, "APPROVED");
+    await userIdRef.set(true);
+
+    let rowItem = document.getElementById("row" + index);
+    rowItem.remove();
+
+    removeConfirmationForm();
+  } catch (error) {
+    console.error("Error approving data:", error);
+  }
+};
+
+let closeDocument = () => {
+  let documentContainer = document.getElementById("documentContainer");
+  documentContainer.remove();
+};
+
+let viewDocument = (url) => {
+  closeViewConfirmation();
+  let pageContainer = document.getElementById("pageContainer");
+  let documentContents;
+  if (url != "undefined") {
+    documentContents = document.createElement("img");
+    documentContents.setAttribute("style", "height: 500px;");
+    documentContents.setAttribute("src", url);
+    documentContents.setAttribute("alt", url);
+  } else {
+    documentContents = document.createElement("div");
+    documentText = document.createTextNode("No Document Available");
+    documentContents.setAttribute("style", "height: fit-content;");
+    documentContents.appendChild(documentText);
+  }
+
+  let documentContainer = document.createElement("div");
+  let documentBackground = document.createElement("div");
+  let documentCloseRow = document.createElement("div");
+  let documentCloseButton = document.createElement("div");
+
+  let documentCloseText = document.createTextNode("Close");
+
+  documentContents.setAttribute("class", "documentContents");
+  documentContainer.setAttribute("class", "documentContainer");
+  documentContainer.setAttribute("id", "documentContainer");
+  documentBackground.setAttribute("class", "documentBackground");
+  documentCloseButton.setAttribute("class", "documentCloseButton");
+  documentCloseButton.setAttribute("onclick", "closeDocument()");
+  documentCloseRow.setAttribute("class", "documentCloseRow");
+
+  pageContainer.appendChild(documentContainer);
+  documentContainer.appendChild(documentBackground);
+  documentCloseRow.appendChild(documentCloseButton);
+  documentCloseButton.appendChild(documentCloseText);
+  documentBackground.appendChild(documentCloseRow);
+  documentBackground.appendChild(documentContents);
+};
+
+let closeViewConfirmation = () => {
+  let confirmationWindowContainer = document.getElementById(
+    "confirmationWindowContainer"
+  );
+  confirmationWindowContainer.remove();
+};
+
+let viewConfirmation = (url) => {
+  let pageContainer = document.getElementById("pageContainer");
+  let confirmationWindowContainer = document.createElement("div");
+  let confirmationWindowBackground = document.createElement("div");
+  let confirmationWindowContents = document.createElement("h2");
+  let confirmationWindowText = document.createTextNode(
+    "Warning, the document you are about to view is private and is only intended for administrators to see. Click PROCEED if you wish to continue"
+  );
+  let closeConfirmationButtonRow = document.createElement("div");
+  let closeConfirmationButtonProceed = document.createElement("h3");
+  let closeConfirmationButtonCancel = document.createElement("h3");
+  let closeConfirmationButtonProceedText = document.createTextNode("PROCEED");
+  let closeConfirmationButtonCancelText = document.createTextNode("CANCEL");
+
+  confirmationWindowContainer.setAttribute("id", "confirmationWindowContainer");
+  confirmationWindowContainer.setAttribute(
+    "class",
+    "confirmationWindowContainer"
+  );
+
+  pageContainer.appendChild(confirmationWindowContainer);
+  confirmationWindowContainer.appendChild(confirmationWindowBackground);
+  confirmationWindowBackground.appendChild(confirmationWindowContents);
+  confirmationWindowBackground.appendChild(closeConfirmationButtonRow);
+  confirmationWindowContents.appendChild(confirmationWindowText);
+  closeConfirmationButtonRow.appendChild(closeConfirmationButtonProceed);
+  closeConfirmationButtonRow.appendChild(closeConfirmationButtonCancel);
+  closeConfirmationButtonProceed.appendChild(
+    closeConfirmationButtonProceedText
+  );
+  closeConfirmationButtonCancel.appendChild(closeConfirmationButtonCancelText);
+
+  closeConfirmationButtonCancel.setAttribute(
+    "onclick",
+    "closeViewConfirmation()"
+  );
+  closeConfirmationButtonCancel.setAttribute(
+    "class",
+    "closeConfirmationButtonCancel"
+  );
+  closeConfirmationButtonCancel.setAttribute(
+    "id",
+    "closeConfirmationButtonCancel"
+  );
+  closeConfirmationButtonProceed.setAttribute(
+    "class",
+    "closeConfirmationButtonProceed"
+  );
+  closeConfirmationButtonProceed.setAttribute(
+    "id",
+    "closeConfirmationButtonProceed"
+  );
+  closeConfirmationButtonProceed.setAttribute(
+    "onclick",
+    'viewDocument("' + url + '")'
+  );
+  confirmationWindowContainer.setAttribute(
+    "class",
+    "confirmationWindowContainer"
+  );
+  confirmationWindowBackground.setAttribute(
+    "class",
+    "confirmationWindowBackground"
+  );
+  confirmationWindowContents.setAttribute(
+    "class",
+    "confirmationWindowContents"
+  );
+  closeConfirmationButtonRow.setAttribute(
+    "class",
+    "closeConfirmationButtonRow"
+  );
 };
 
 let createRow = (rowObject, index, userId) => {
@@ -193,8 +386,7 @@ let createRow = (rowObject, index, userId) => {
   let blankData = document.createTextNode("N/A");
   let trueData = document.createTextNode("Verified");
   let falseData = document.createTextNode("Not Verified");
-  let documentButton = document.createElement("a");
-  let documentContent = document.createElement("button");
+  let documentButton = document.createElement("button");
   let approveButton = document.createElement("button");
   let rejectButton = document.createElement("button");
   let terminateButton = document.createElement("button");
@@ -211,16 +403,17 @@ let createRow = (rowObject, index, userId) => {
   let terminateData = document.createTextNode("TERMINATE");
   let locationData = document.createTextNode("LOCATION");
 
-  documentButton.appendChild(documentContent);
-  documentContent.appendChild(documentData);
+  documentButton.appendChild(documentData);
   approveButton.appendChild(approveData);
   rejectButton.appendChild(rejectData);
   terminateButton.appendChild(terminateData);
   locationButton.appendChild(locationData);
 
   row.setAttribute("id", "row" + index);
-  documentButton.setAttribute("href", documentUrl);
-  documentButton.setAttribute("target", "_blank");
+  documentButton.setAttribute(
+    "onclick",
+    'viewConfirmation("' + documentUrl + '")'
+  );
   approveButton.setAttribute(
     "onclick",
     'confirmationForm("approve","' + userId + '",' + index + ")"
@@ -299,11 +492,75 @@ let createRow = (rowObject, index, userId) => {
   }
 };
 
+let queryCreate = (obj, index, userId) => {
+  if (dataQuery == "PendCust") {
+    if (obj.usertype == "Customer" && obj.approved == false)
+      createRow(obj, index, userId);
+  }
+  if (dataQuery == "ApprCust") {
+    if (obj.usertype == "Customer" && obj.approved == true)
+      createRow(obj, index, userId);
+  }
+  if (dataQuery == "PendMech") {
+    if (obj.usertype == "Mechanic" && obj.approved == false)
+      createRow(obj, index, userId);
+  }
+  if (dataQuery == "ApprMech") {
+    if (obj.usertype == "Mechanic" && obj.approved == true)
+      createRow(obj, index, userId);
+  }
+  if (dataQuery == "PendSO") {
+    if (obj.usertype == "Repair Shop" && obj.approved == false)
+      createRow(obj, index, userId);
+  }
+  if (dataQuery == "ApprSO") {
+    if (obj.usertype == "Repair Shop" && obj.approved == true)
+      createRow(obj, index, userId);
+  }
+};
+
+let checkRowCount = () => {
+  let rowCount = 0;
+  dataChildren.forEach((obj) => {
+    if (dataQuery == "PendCust") {
+      if (obj.usertype == "Customer" && obj.approved == false) rowCount += 1;
+    }
+    if (dataQuery == "ApprCust") {
+      if (obj.usertype == "Customer" && obj.approved == true) rowCount += 1;
+    }
+    if (dataQuery == "PendMech") {
+      if (obj.usertype == "Mechanic" && obj.approved == false) rowCount += 1;
+    }
+    if (dataQuery == "ApprMech") {
+      if (obj.usertype == "Mechanic" && obj.approved == true) rowCount += 1;
+    }
+    if (dataQuery == "PendSO") {
+      if (obj.usertype == "Repair Shop" && obj.approved == false) rowCount += 1;
+    }
+    if (dataQuery == "ApprSO") {
+      if (obj.usertype == "Repair Shop" && obj.approved == true) rowCount += 1;
+    }
+  });
+  return rowCount;
+};
+
+let noDataFound = () => {
+  let parent = document.getElementById("table-content");
+  let row = document.createElement("tr");
+  let item = document.createElement("th");
+  let noDataText = document.createTextNode("No Data Avaialable");
+
+  parent.appendChild(row);
+  row.appendChild(item);
+  item.appendChild(noDataText);
+};
+
 retrieveData().then(() => {
+  let rowCount = checkRowCount();
+  let noDataBool = false;
   if (dataChildren) {
     dataChildren.forEach((obj, index) => {
       // Your code to create and append table rows goes here
-
       let userEmail = obj.email;
       let userId;
 
@@ -315,30 +572,12 @@ retrieveData().then(() => {
             userId = child.key;
           });
         });
-
-      if (dataQuery == "PendCust") {
-        if (obj.usertype == "Customer" && obj.approved == false)
-          createRow(obj, index, userId);
-      }
-      if (dataQuery == "ApprCust") {
-        if (obj.usertype == "Customer" && obj.approved == true)
-          createRow(obj, index, userId);
-      }
-      if (dataQuery == "PendMech") {
-        if (obj.usertype == "Mechanic" && obj.approved == false)
-          createRow(obj, index, userId);
-      }
-      if (dataQuery == "ApprMech") {
-        if (obj.usertype == "Mechanic" && obj.approved == true)
-          createRow(obj, index, userId);
-      }
-      if (dataQuery == "PendSO") {
-        if (obj.usertype == "Repair Shop" && obj.approved == false)
-          createRow(obj, index, userId);
-      }
-      if (dataQuery == "ApprSO") {
-        if (obj.usertype == "Repair Shop" && obj.approved == true)
-          createRow(obj, index, userId);
+      if (rowCount != 0) queryCreate(obj, index, userId);
+      else {
+        if (!noDataBool) {
+          noDataFound();
+          noDataBool = true;
+        }
       }
     });
   } else {

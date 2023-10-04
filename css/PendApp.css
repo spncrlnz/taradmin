@@ -4,6 +4,82 @@
   grid-area: overlap;
 }
 
+.documentContainer {
+  grid-area: overlap;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  z-index: 99;
+}
+
+.documentBackground {
+  background-color: white;
+  padding: 20px;
+  height: fit-content;
+  width: fit-content;
+  border-radius: 10px;
+}
+
+.documentContents {
+  width: auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+.documentCloseButton {
+  cursor: pointer;
+}
+
+.documentCloseRow {
+  width: 100%;
+  display: flex;
+  justify-content: right;
+}
+
+.confirmationWindowContainer {
+  grid-area: overlap;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  z-index: 99;
+}
+
+.confirmationWindowBackground {
+  background-color: white;
+  padding: 20px;
+  width: 500px;
+  height: auto;
+  border-radius: 10px;
+}
+
+.confirmationWindowContents {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.closeConfirmationButtonRow {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.closeConfirmationButtonProceed {
+  cursor: pointer;
+}
+
+.closeConfirmationButtonCancel {
+  cursor: pointer;
+}
+
 .confirmationContainer {
   grid-area: overlap;
   height: 100vh;
@@ -12,6 +88,7 @@
   justify-content: center;
   align-items: center;
   color: black;
+  z-index: 99;
 }
 
 .confirmationBackground {
