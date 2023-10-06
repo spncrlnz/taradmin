@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Include your CSS styles here */
+body {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure that the content stretches to at least the full viewport height */
+}
+
+body.dark-mode {
+    background-color: #333;
+    color: #fff;
+    /* Font color in Night Mode */
+}
+
+header {
+    text-align: center; /* Center align the content horizontally */
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+}
+
+.header-content {
+    display: flex;
+    align-items: center; /* Vertically align content */
+    justify-content: center; /* Center align content horizontally within the header */
+}
+
+.logo img {
+    max-width: 200px; /* Adjust the maximum width of the logo as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
+h1 {
+    font-size: 36px;
+}
+
+/* Placeholder for Logo */
+.logo {
+    /* Add your logo image URL and adjust width and height as needed */
+    background-image: url('your-logo-image.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    max-width: 100%;
+    /* Make the logo responsive */
+    height: auto;
+    /* Maintain aspect ratio */
+    margin: 20px auto;
+}
+
+.container {
+    max-width: 100%; /* Set the maximum width to 100% to make them as wide as the viewport */
+    margin: 10px auto; /* Add margin for space around the container */
+    padding: 100px; /* Add padding inside the container */
+    background-color: #333; /* Background color set to #333 (dark gray) */
+    color: #fff; /* Font color set to off-white */
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    line-height: 1;
+}
+
+
+p {
+    font-size: 15px;
+    line-height: 1;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    margin-top: auto; /* Push the footer to the bottom */
+}
+
+.section {
+    display: none;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
+    h1 {
+        font-size: 24px;
+    }
+
+    .container {
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    p {
+        font-size: 14px;
+    }
+}
