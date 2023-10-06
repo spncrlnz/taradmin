@@ -104,6 +104,7 @@
   justify-content: space-around;
 }
 
+/* Viewing Map Styles */
 .mapContainer {
   grid-area: overlap;
   height: 100vh;
@@ -114,12 +115,13 @@
 }
 
 .mapBackground {
-  background-color: white;
+  background-color: #333;
   padding: 20px;
   height: fit-content;
   width: fit-content;
   border-radius: 10px;
 }
+
 .mapClose {
   background-color: blue;
   width: 100%;
@@ -248,35 +250,4 @@ b.sidebar-link {
 
 #sidebar.collapsed {
   margin-left: -264px;
-}
-
-/* Night & Day Button */
-
-.theme-toggle {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-65%);
-  text-align: center;
-  z-index: 10;
-  right: 0;
-  left: auto;
-  border: none;
-  background-color: var(--bs-body-color);
-}
-
-html[data-bs-theme="dark"] .theme-toggle .fa-sun,
-html[data-bs-theme="light"] .theme-toggle .fa-moon {
-  cursor: pointer;
-  padding: 10px;
-  display: block;
-  font-size: 1.25rem;
-  color: #fff;
-}
-
-html[data-bs-theme="dark"] .theme-toggle .fa-moon {
-  display: none;
-}
-
-html[data-bs-theme="light"] .theme-toggle .fa-sun {
-  display: none;
 }

@@ -173,11 +173,12 @@ let sendEmailNotification = (userEmail, actionTaken) => {
     To: userEmail,
     Subject: "Your Account has been " + actionTaken,
     Body:
-      "CONGRATULATIONS, Your Account " +
+      "Your Account " +
       userEmail +
       " has been " +
       actionTaken +
-      ".",
+      ". " +
+      "If you believe there has been a mistake, please reach out to our support team for further assistance. Best regards, The Tap and Repair Application Team.",
   };
 
   let serviceId = "service_ghy4wru";
@@ -310,7 +311,7 @@ let viewConfirmation = (url) => {
   let confirmationWindowBackground = document.createElement("div");
   let confirmationWindowContents = document.createElement("h2");
   let confirmationWindowText = document.createTextNode(
-    "Warning, the document you are about to view is private and is only intended for administrators to see. Click PROCEED if you wish to continue"
+    "Warning, the document you are about to view is private and is only intended for administrators to see. Click 'PROCEED' if you wish to continue."
   );
   let closeConfirmationButtonRow = document.createElement("div");
   let closeConfirmationButtonProceed = document.createElement("h3");
@@ -550,7 +551,7 @@ let noDataFound = () => {
   let parent = document.getElementById("table-content");
   let row = document.createElement("tr");
   let item = document.createElement("th");
-  let noDataText = document.createTextNode("No Data Avaialable");
+  let noDataText = document.createTextNode("No Data Available.");
 
   parent.appendChild(row);
   row.appendChild(item);
@@ -583,7 +584,7 @@ retrieveData().then(() => {
       }
     });
   } else {
-    console.log("No data available."); // Handle the case when data is null
+    console.log("No Data Available."); // Handle the case when data is null
   }
 });
 
