@@ -21,6 +21,11 @@ let userObject = {
   approved: Boolean,
   booked: Boolean,
   contactnumber: String,
+  documents: {
+    cert: String,
+    id: String,
+    selfy: String,
+  },
   email: String,
   fullname: String,
   location: {
@@ -255,47 +260,96 @@ let approveData = async (userIdRef, index) => {
 };
 
 let closeDocument = () => {
-  let documentContainer = document.getElementById("documentContainer");
-  documentContainer.remove();
+  let viewDocumentContainer = document.getElementById("viewDocumentContainer");
+  viewDocumentContainer.remove();
 };
 
-let viewDocument = (url) => {
+let openDocument = (url) => {
+  let initialDocumentTextContainer = document.getElementById(
+    "initialDocumentTextContainer"
+  );
+  if (url == "") {
+    initialDocumentTextContainer.innerHTML = "No Document Available";
+  } else {
+    let actualDocument = document.createElement("img");
+    actualDocument.setAttribute("src", url);
+    initialDocumentTextContainer.innerHTML = "";
+    initialDocumentTextContainer.appendChild(actualDocument);
+  }
+};
+
+let viewDocument = (documents) => {
   closeViewConfirmation();
   let pageContainer = document.getElementById("pageContainer");
-  let documentContents;
-  if (url != "undefined") {
-    documentContents = document.createElement("img");
-    documentContents.setAttribute("style", "height: 500px;");
-    documentContents.setAttribute("src", url);
-    documentContents.setAttribute("alt", url);
+  let viewDocumentContainer = document.createElement("div");
+  viewDocumentContainer.setAttribute("class", "viewDocumentContainer");
+  viewDocumentContainer.setAttribute("id", "viewDocumentContainer");
+  let viewDocumentBackground = document.createElement("div");
+  viewDocumentBackground.setAttribute("class", "viewDocumentBackground");
+  let viewDocumentContents = document.createElement("div");
+  viewDocumentContents.setAttribute("class", "viewDocumentContents");
+  let viewDocumentView = document.createElement("div");
+  viewDocumentView.setAttribute("class", "viewDocumentView");
+  let initialDocumentTextContainer = document.createElement("div");
+  initialDocumentTextContainer.setAttribute(
+    "id",
+    "initialDocumentTextContainer"
+  );
+  let initialDocumentText = document.createTextNode(
+    "Click the buttons to view documents."
+  );
+  let closeButton = document.createElement("button");
+  closeButton.setAttribute("class", "viewDocumentCloseButton");
+  let closeText = document.createTextNode("CLOSE");
+  let cert = documents.cert;
+  let id = documents.id;
+  let selfy = documents.selfy;
+  let certButton;
+  let idButton;
+  let selfyButton;
+  if (dataQuery.includes("Cust")) {
+    idButton = document.createElement("button");
+    selfyButton = document.createElement("button");
+    idText = document.createTextNode("ID");
+    selfyText = document.createTextNode("Selfie");
+    idButton.setAttribute("class", "viewDocumentButton");
+    selfyButton.setAttribute("class", "viewDocumentButton");
+    idButton.setAttribute("onclick", "openDocument('" + id + "')");
+    selfyButton.setAttribute("onclick", "openDocument('" + selfy + "')");
+    viewDocumentContents.appendChild(idButton);
+    viewDocumentContents.appendChild(selfyButton);
+    idButton.appendChild(idText);
+    selfyButton.appendChild(selfyText);
   } else {
-    documentContents = document.createElement("div");
-    documentText = document.createTextNode("No Document Available");
-    documentContents.setAttribute("style", "height: fit-content;");
-    documentContents.appendChild(documentText);
+    certButton = document.createElement("button");
+    idButton = document.createElement("button");
+    selfyButton = document.createElement("button");
+    certButton.setAttribute("class", "viewDocumentButton");
+    idButton.setAttribute("class", "viewDocumentButton");
+    selfyButton.setAttribute("class", "viewDocumentButton");
+    certButton.setAttribute("onclick", "openDocument('" + cert + "')");
+    idButton.setAttribute("onclick", "openDocument('" + id + "')");
+    selfyButton.setAttribute("onclick", "openDocument('" + selfy + "')");
+    certText = document.createTextNode("Certificate");
+    idText = document.createTextNode("ID");
+    selfyText = document.createTextNode("Selfie");
+    viewDocumentContents.appendChild(certButton);
+    viewDocumentContents.appendChild(idButton);
+    viewDocumentContents.appendChild(selfyButton);
+    certButton.appendChild(certText);
+    idButton.appendChild(idText);
+    selfyButton.appendChild(selfyText);
   }
 
-  let documentContainer = document.createElement("div");
-  let documentBackground = document.createElement("div");
-  let documentCloseRow = document.createElement("div");
-  let documentCloseButton = document.createElement("div");
-
-  let documentCloseText = document.createTextNode("Close");
-
-  documentContents.setAttribute("class", "documentContents");
-  documentContainer.setAttribute("class", "documentContainer");
-  documentContainer.setAttribute("id", "documentContainer");
-  documentBackground.setAttribute("class", "documentBackground");
-  documentCloseButton.setAttribute("class", "documentCloseButton");
-  documentCloseButton.setAttribute("onclick", "closeDocument()");
-  documentCloseRow.setAttribute("class", "documentCloseRow");
-
-  pageContainer.appendChild(documentContainer);
-  documentContainer.appendChild(documentBackground);
-  documentCloseRow.appendChild(documentCloseButton);
-  documentCloseButton.appendChild(documentCloseText);
-  documentBackground.appendChild(documentCloseRow);
-  documentBackground.appendChild(documentContents);
+  pageContainer.appendChild(viewDocumentContainer);
+  viewDocumentContainer.appendChild(viewDocumentBackground);
+  viewDocumentBackground.appendChild(viewDocumentContents);
+  viewDocumentBackground.appendChild(viewDocumentView);
+  viewDocumentView.appendChild(initialDocumentTextContainer);
+  initialDocumentTextContainer.appendChild(initialDocumentText);
+  viewDocumentBackground.appendChild(closeButton);
+  closeButton.appendChild(closeText);
+  closeButton.setAttribute("onclick", "closeDocument()");
 };
 
 let closeViewConfirmation = () => {
@@ -305,7 +359,7 @@ let closeViewConfirmation = () => {
   confirmationWindowContainer.remove();
 };
 
-let viewConfirmation = (url) => {
+let viewConfirmation = (documents) => {
   let pageContainer = document.getElementById("pageContainer");
   let confirmationWindowContainer = document.createElement("div");
   let confirmationWindowBackground = document.createElement("div");
@@ -359,7 +413,7 @@ let viewConfirmation = (url) => {
   );
   closeConfirmationButtonProceed.setAttribute(
     "onclick",
-    'viewDocument("' + url + '")'
+    "viewDocument(" + documents + ")"
   );
   confirmationWindowContainer.setAttribute(
     "class",
@@ -399,7 +453,8 @@ let createRow = (rowObject, index, userId) => {
   let emailData = document.createTextNode(userObject.email);
   let numberData = document.createTextNode(userObject.contactnumber);
   let emailStatusData = document.createTextNode(userObject.verified);
-  let documentUrl = userObject.profilePictureUrl;
+  let userDocuments = userObject.documents;
+  let documentProfilePictureUrl = userObject.profilePictureUrl;
   let documentData = document.createTextNode("VIEW");
   let approveData = document.createTextNode("APPROVE");
   let rejectData = document.createTextNode("REJECT");
@@ -415,7 +470,7 @@ let createRow = (rowObject, index, userId) => {
   row.setAttribute("id", "row" + index);
   documentButton.setAttribute(
     "onclick",
-    'viewConfirmation("' + documentUrl + '")'
+    "viewConfirmation('" + JSON.stringify(userDocuments) + "')"
   );
   approveButton.setAttribute(
     "onclick",
