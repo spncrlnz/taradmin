@@ -4,6 +4,7 @@
   grid-area: overlap;
 }
 
+/*Legal Documents Container*/
 .viewDocumentContainer {
   grid-area: overlap;
   height: 100vh;
@@ -21,6 +22,7 @@
   height: fit-content;
   width: fit-content;
   border-radius: 10px;
+  color: #e9ecef;
 }
 
 .viewDocumentContents {
@@ -136,7 +138,7 @@
 }
 
 .mapClose {
-  background-color: blue;
+  background-color: rgb(35, 21, 111);
   width: 100%;
   height: 40px;
   font-size: 20px;
