@@ -16,7 +16,8 @@ let dataRef = database.ref("users");
 let data;
 let dataChildren = [];
 let dataQuery;
-// User Object
+
+// User Objects
 let userObject = {
   approved: Boolean,
   booked: Boolean,
@@ -61,11 +62,13 @@ let retrieveData = () => {
   });
 };
 
+//Map Container
 let closeMap = () => {
   let mapContainer = document.getElementById("mapContainer");
   mapContainer.remove();
 };
 
+//View Map Container 
 let viewLocation = (index) => {
   let pageContainer = document.getElementById("pageContainer");
 
@@ -112,6 +115,7 @@ let removeConfirmationForm = () => {
   confirmationForm.remove();
 };
 
+//Approve or Reject User 
 let confirmationForm = (action, userIdRef, index) => {
   let confirmationText = document.createTextNode(
     "Are you sure you want to " + action + " the user?"
@@ -166,6 +170,7 @@ let confirmationForm = (action, userIdRef, index) => {
   }
 };
 
+//E-Mail Notification
 let sendEmailNotification = (userEmail, actionTaken) => {
   //UN: tapandrepairtar@gmail.com
   //PW: TARTARus;
@@ -199,18 +204,7 @@ let sendEmailNotification = (userEmail, actionTaken) => {
     });
 };
 
-/*return new Promise((resolve) => {
-  dataRef.on("value", (snapshot) => {
-    data = snapshot.val();
-    if (data) {
-      dataChildren = Object.values(data);
-    } else {
-      dataChildren = []; // Initialize dataChildren as an empty array if data is null
-    }
-    resolve();
-  });
-});*/
-
+//Removed User EMail Notification
 let removeData = async (userIdRef, index) => {
   try {
     userIdRef = "users/" + userIdRef;
@@ -234,6 +228,7 @@ let removeData = async (userIdRef, index) => {
   }
 };
 
+//Approved User EMail Notification
 let approveData = async (userIdRef, index) => {
   try {
     let userEmailRef = "users/" + userIdRef;
@@ -259,11 +254,13 @@ let approveData = async (userIdRef, index) => {
   }
 };
 
+//Legal Documents Container
 let closeDocument = () => {
   let viewDocumentContainer = document.getElementById("viewDocumentContainer");
   viewDocumentContainer.remove();
 };
 
+//Legal Documents Opener
 let openDocument = (url) => {
   let initialDocumentTextContainer = document.getElementById(
     "initialDocumentTextContainer"
@@ -278,28 +275,35 @@ let openDocument = (url) => {
   }
 };
 
-let viewDocument = (documents) => {
-  closeViewConfirmation();
+//Legal Documents Opener
+let viewDocument = (documents) => { closeViewConfirmation();
+  
   let pageContainer = document.getElementById("pageContainer");
   let viewDocumentContainer = document.createElement("div");
   viewDocumentContainer.setAttribute("class", "viewDocumentContainer");
   viewDocumentContainer.setAttribute("id", "viewDocumentContainer");
+  
   let viewDocumentBackground = document.createElement("div");
   viewDocumentBackground.setAttribute("class", "viewDocumentBackground");
+
   let viewDocumentContents = document.createElement("div");
   viewDocumentContents.setAttribute("class", "viewDocumentContents");
+  
   let viewDocumentView = document.createElement("div");
   viewDocumentView.setAttribute("class", "viewDocumentView");
+  
   let initialDocumentTextContainer = document.createElement("div");
   initialDocumentTextContainer.setAttribute(
-    "id",
-    "initialDocumentTextContainer"
+    "id", "initialDocumentTextContainer"
   );
+  
   let initialDocumentText = document.createTextNode(
     "Click the buttons to view documents."
   );
+  
   let closeButton = document.createElement("button");
   closeButton.setAttribute("class", "viewDocumentCloseButton");
+  
   let closeText = document.createTextNode("CLOSE");
   let cert = documents.cert;
   let id = documents.id;
@@ -307,6 +311,7 @@ let viewDocument = (documents) => {
   let certButton;
   let idButton;
   let selfyButton;
+
   if (dataQuery.includes("Cust")) {
     idButton = document.createElement("button");
     selfyButton = document.createElement("button");
@@ -352,6 +357,7 @@ let viewDocument = (documents) => {
   closeButton.setAttribute("onclick", "closeDocument()");
 };
 
+//Close Button
 let closeViewConfirmation = () => {
   let confirmationWindowContainer = document.getElementById(
     "confirmationWindowContainer"
@@ -359,6 +365,7 @@ let closeViewConfirmation = () => {
   confirmationWindowContainer.remove();
 };
 
+//Warning Message for Privacy
 let viewConfirmation = (documents) => {
   let pageContainer = document.getElementById("pageContainer");
   let confirmationWindowContainer = document.createElement("div");
@@ -433,6 +440,7 @@ let viewConfirmation = (documents) => {
   );
 };
 
+//Display Data Users
 let createRow = (rowObject, index, userId) => {
   // FullName > Email > Number > Email-Status > Document > Reject > Approve
   userObject = rowObject;
@@ -454,7 +462,6 @@ let createRow = (rowObject, index, userId) => {
   let numberData = document.createTextNode(userObject.contactnumber);
   let emailStatusData = document.createTextNode(userObject.verified);
   let userDocuments = userObject.documents;
-  let documentProfilePictureUrl = userObject.profilePictureUrl;
   let documentData = document.createTextNode("VIEW");
   let approveData = document.createTextNode("APPROVE");
   let rejectData = document.createTextNode("REJECT");
@@ -550,6 +557,7 @@ let createRow = (rowObject, index, userId) => {
   }
 };
 
+//Fetching Data
 let queryCreate = (obj, index, userId) => {
   if (dataQuery == "PendCust") {
     if (obj.usertype == "Customer" && obj.approved == false)
@@ -577,6 +585,7 @@ let queryCreate = (obj, index, userId) => {
   }
 };
 
+//Checking if there is Data Available
 let checkRowCount = () => {
   let rowCount = 0;
   dataChildren.forEach((obj) => {
@@ -602,23 +611,24 @@ let checkRowCount = () => {
   return rowCount;
 };
 
+//No Data Found
 let noDataFound = () => {
   let parent = document.getElementById("table-content");
   let row = document.createElement("tr");
   let item = document.createElement("th");
-  let noDataText = document.createTextNode("No Data Available.");
+  let noDataText = document.createTextNode("No Data Found.");
 
   parent.appendChild(row);
   row.appendChild(item);
   item.appendChild(noDataText);
 };
 
+//Data Availability
 retrieveData().then(() => {
   let rowCount = checkRowCount();
   let noDataBool = false;
   if (dataChildren) {
     dataChildren.forEach((obj, index) => {
-      // Your code to create and append table rows goes here
       let userEmail = obj.email;
       let userId;
 
@@ -639,7 +649,7 @@ retrieveData().then(() => {
       }
     });
   } else {
-    console.log("No Data Available."); // Handle the case when data is null
+    noDataFound();
   }
 });
 
