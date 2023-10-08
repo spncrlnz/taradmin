@@ -68,7 +68,7 @@ let closeMap = () => {
   mapContainer.remove();
 };
 
-//View Map Container 
+//View Map Container
 let viewLocation = (index) => {
   let pageContainer = document.getElementById("pageContainer");
 
@@ -115,7 +115,7 @@ let removeConfirmationForm = () => {
   confirmationForm.remove();
 };
 
-//Approve or Reject User 
+//Approve or Reject User
 let confirmationForm = (action, userIdRef, index) => {
   let confirmationText = document.createTextNode(
     "Are you sure you want to " + action + " the user?"
@@ -276,38 +276,41 @@ let openDocument = (url) => {
 };
 
 //Legal Documents Opener
-let viewDocument = (documents) => { closeViewConfirmation();
-  
+let viewDocument = (documents) => {
+  closeViewConfirmation();
+
   let pageContainer = document.getElementById("pageContainer");
   let viewDocumentContainer = document.createElement("div");
   viewDocumentContainer.setAttribute("class", "viewDocumentContainer");
   viewDocumentContainer.setAttribute("id", "viewDocumentContainer");
-  
+
   let viewDocumentBackground = document.createElement("div");
   viewDocumentBackground.setAttribute("class", "viewDocumentBackground");
 
   let viewDocumentContents = document.createElement("div");
   viewDocumentContents.setAttribute("class", "viewDocumentContents");
-  
+
   let viewDocumentView = document.createElement("div");
   viewDocumentView.setAttribute("class", "viewDocumentView");
-  
+
   let initialDocumentTextContainer = document.createElement("div");
   initialDocumentTextContainer.setAttribute(
-    "id", "initialDocumentTextContainer"
+    "id",
+    "initialDocumentTextContainer"
   );
-  
+
   let initialDocumentText = document.createTextNode(
     "Click the buttons to view documents."
   );
-  
+
   let closeButton = document.createElement("button");
   closeButton.setAttribute("class", "viewDocumentCloseButton");
-  
+
   let closeText = document.createTextNode("CLOSE");
   let cert = documents.cert;
   let id = documents.id;
   let selfy = documents.selfy;
+  let permit = documents.permit;
   let certButton;
   let idButton;
   let selfyButton;
@@ -325,7 +328,7 @@ let viewDocument = (documents) => { closeViewConfirmation();
     viewDocumentContents.appendChild(selfyButton);
     idButton.appendChild(idText);
     selfyButton.appendChild(selfyText);
-  } else {
+  } else if (dataQuery.includes("Mech")) {
     certButton = document.createElement("button");
     idButton = document.createElement("button");
     selfyButton = document.createElement("button");
@@ -342,6 +345,25 @@ let viewDocument = (documents) => { closeViewConfirmation();
     viewDocumentContents.appendChild(idButton);
     viewDocumentContents.appendChild(selfyButton);
     certButton.appendChild(certText);
+    idButton.appendChild(idText);
+    selfyButton.appendChild(selfyText);
+  } else if (dataQuery.includes("SO")) {
+    permitButton = document.createElement("button");
+    idButton = document.createElement("button");
+    selfyButton = document.createElement("button");
+    permitButton.setAttribute("class", "viewDocumentButton");
+    idButton.setAttribute("class", "viewDocumentButton");
+    selfyButton.setAttribute("class", "viewDocumentButton");
+    permitButton.setAttribute("onclick", "openDocument('" + permit + "')");
+    idButton.setAttribute("onclick", "openDocument('" + id + "')");
+    selfyButton.setAttribute("onclick", "openDocument('" + selfy + "')");
+    permitText = document.createTextNode("Permit");
+    idText = document.createTextNode("ID");
+    selfyText = document.createTextNode("Selfie");
+    viewDocumentContents.appendChild(permitButton);
+    viewDocumentContents.appendChild(idButton);
+    viewDocumentContents.appendChild(selfyButton);
+    permitButton.appendChild(permitText);
     idButton.appendChild(idText);
     selfyButton.appendChild(selfyText);
   }
