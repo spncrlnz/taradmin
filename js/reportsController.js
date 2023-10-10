@@ -22,7 +22,7 @@ let retrieveReports = async () => {
     reportsData = snapshot.val();
     reportsData = Object.values(reportsData);
     let row = document.createElement("tr");
-    console.log(reportsData);
+    W;
     if (reportsData) {
       reportsData.forEach((data) => {
         tableParent.appendChild(row);
@@ -58,7 +58,6 @@ let getName = async (userId) => {
     let nameRef = database.ref("users/" + userId);
     const snapshot = await nameRef.once("value");
     const user = snapshot.val();
-    console.log(user.fullname);
     return user.fullname;
   } catch {
     console.error("Error retrieving Name:", error);
