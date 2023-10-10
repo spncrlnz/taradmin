@@ -64,3 +64,16 @@ let getName = async (userId) => {
 };
 
 retrieveReports();
+
+//SignOut Button
+function signout() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch((error) => {
+      alert(error);
+    });
+}

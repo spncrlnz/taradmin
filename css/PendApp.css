@@ -252,15 +252,6 @@ a.sidebar-link {
   font-size: 0.875rem;
 }
 
-b.sidebar-link {
-  padding: 1.5rem 0.8rem 0.25rem;
-  color: #e9ecef;
-  position: relative;
-  display: block;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
 /* Collapsible Button for Sidebar */
 
 #sidebar.collapsed {

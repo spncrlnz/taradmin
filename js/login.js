@@ -14,7 +14,7 @@ firebase.initializeApp(firebaseConfig);
 function Login() {
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
-  if (email == "taradmin" && password == "tartarus") {
+  if (email == "tapandrepairtar@gmail.com" && password == "TARTARus") {
     email = "fronda.kd@gmail.com";
     password = "Qwerty123@";
     firebase

@@ -135,3 +135,14 @@ img {
   display: flex;
   justify-content: center;
 }
+
+.terms-privacy-links {
+  position: fixed;
+  bottom: 90px;
+  left: 540px;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}

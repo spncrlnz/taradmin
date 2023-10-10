@@ -6,15 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>T.A.R. Dashboard</title>
     <link rel="icon" href="./images/icon_logo.png" type="image/x-icon" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    />
-    <script
-      src="https://kit.fontawesome.com/6f40c2c1f0.js"
-      crossorigin="anonymous"
-      defer
-    ></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <script src="https://kit.fontawesome.com/6f40c2c1f0.js" crossorigin="anonymous" defer ></script>
     <link rel="stylesheet" href="css/PendApp.css" />
   </head>
 
@@ -56,6 +49,8 @@
                 </a>
               </li>
 
+              <hr />
+
               <!--Approved-->
               <li class="sidebar-header">Approved</li>
               <li class="sidebar-item">
@@ -77,20 +72,22 @@
                 </a>
               </li>
 
+              <hr />
+
               <!--Reports-->
               <li class="sidebar-link">
-                <b href="Reports.html" class="sidebar-link">
+                <a href="Reports.html" class="sidebar-link">
                   <i class="fa-solid fa-file-pen"></i>
                   Reports
-                </b>
+                </a>
               </li>
 
               <!--Log Out-->
               <li class="sidebar-link">
-                <b href="#" class="sidebar-link">
+                <a href="#" onclick="signout()" class="sidebar-link">
                   <i class="fa-solid fa-right-from-bracket"></i>
                   Log-Out
-                </b>
+                </a>
               </li>
             </ul>
           </div>
@@ -122,12 +119,8 @@
             </div> -->
               <div class="card-body">
                 <table class="table">
-                  <thead
-                    class="table-dark table-bordered align-items-center mb-0"
-                  >
-                    <tr
-                      class="text-uppercase text-nonwrap text-xxs font-weight-bolder ps-2"
-                    >
+                  <thead class="table-dark table-bordered align-items-center mb-0" >
+                    <tr class="text-uppercase text-nonwrap text-xxs font-weight-bolder ps-2">
                       <th>Reported User</th>
                       <th>Complaint</th>
                       <th>Date/Time</th>
