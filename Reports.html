@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>T.A.R. Dashboard</title>
-    <link rel="icon" href="images/logo.png" type="image/x-icon" />
+    <link rel="icon" href="./images/icon_logo.png" type="image/x-icon" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -27,7 +27,7 @@
           <div class="sidebar-logo">
             <a href="#">
               <img
-                src="images/logo.png"
+                src="./images/icon_logo.png"
                 style="width: auto; height: 60px; max-height: 120px"
                 alt="Logo"
                 srcset=""
@@ -133,6 +133,7 @@
                       <th>Date/Time</th>
                       <th>Reported By</th>
                     </tr>
+                    <tbody class="dataTable"></tbody>
                   </thead>
                   <tbody class="table-cotent"></tbody>
                 </table>
@@ -144,7 +145,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/PCustomers.js"></script>
 
     <!--Collapsible Button for Sidebar-->
     <script>
@@ -155,6 +155,11 @@
     </script>
 
     <!--Separate JavaScript File Connection for Firebase-->
-    <script src="js/config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+
+    <!--Separate JavaScript File Connection for Firebase-->
+    <script src="js/reportsController.js"></script>
   </body>
 </html>
