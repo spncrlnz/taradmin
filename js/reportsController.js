@@ -22,7 +22,6 @@ let retrieveReports = async () => {
     reportsData = snapshot.val();
     reportsData = Object.values(reportsData);
     let row = document.createElement("tr");
-    W;
     if (reportsData) {
       reportsData.forEach((data) => {
         tableParent.appendChild(row);
