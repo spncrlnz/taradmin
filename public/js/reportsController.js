@@ -21,13 +21,14 @@ let retrieveReports = async () => {
     const snapshot = await reportsRef.once("value");
     reportsData = snapshot.val();
     reportsData = Object.values(reportsData);
-    let row = document.createElement("tr");
     if (reportsData) {
       reportsData.forEach((data) => {
+        let row = document.createElement("tr");
         tableParent.appendChild(row);
         createRows(data, row);
       });
     } else {
+      let row = document.createElement("tr");
       let rowItem = document.createElement("th");
       let rowItemText = document.createTextNode("No Available Data");
       tableParent.appendChild(row);
