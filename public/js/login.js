@@ -11,6 +11,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
+let incorrectLogin = false;
 function Login() {
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
@@ -29,9 +30,12 @@ function Login() {
         console.error("Error Singning In: ", error.code, error.message);
       });
   } else {
-    let errorContainer = document.getElementById("login-error");
-    let errorText = document.createTextNode("Incorrect Username/Password");
-    errorContainer.appendChild(errorText);
+    if (!incorrectLogin) {
+      let errorContainer = document.getElementById("login-error");
+      let errorText = document.createTextNode("Incorrect Username/Password");
+      errorContainer.appendChild(errorText);
+      incorrectLogin = true;
+    }
   }
 }
 
