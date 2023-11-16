@@ -11,12 +11,15 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
+let database = firebase.database();
+let adminsRef = database.ref("admins");
+
 let incorrectLogin = false;
-function Login() {
+let Login = async () => {
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
-  if (email == "tapandrepairtar@gmail.com" && password == "TARTARus") {
-    email = "fronda.kd@gmail.com";
+  /*if (email == "tapandrepairtar@gmail.com" && password == "TARTARus") {
+    email = "frondakd7@gmail.com";
     password = "Qwerty123@";
     firebase
       .auth()
@@ -24,7 +27,8 @@ function Login() {
       .then((userCredential) => {
         let user = userCredential.user;
         console.log("User Signed In: ", user);
-        window.open("../PendCust.html", "_self");
+        const snapshot = await;
+        //window.open("PendCust.html", "_self");
       })
       .catch((error) => {
         console.error("Error Singning In: ", error.code, error.message);
@@ -36,8 +40,47 @@ function Login() {
       errorContainer.appendChild(errorText);
       incorrectLogin = true;
     }
+  }*/
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      let user = userCredential.user;
+      let userIsAdmin = checkAdmin(user.email);
+      if (userIsAdmin) window.open("PendCust.html", "_self");
+      else {
+      }
+    })
+    .catch((error) => {
+      console.error("Error Signing In: ", error.code, error.message);
+      loginError();
+    });
+};
+
+let loginError = () => {
+  if (!incorrectLogin) {
+    let errorContainer = document.getElementById("login-error");
+    let errorText = document.createTextNode("Incorrect Username/Password");
+    errorContainer.appendChild(errorText);
+    incorrectLogin = true;
   }
-}
+};
+
+let checkAdmin = async (userEmail) => {
+  try {
+    const snapshot = await adminsRef.once("value");
+    adminData = snapshot.val();
+    adminData = Object.values(adminData);
+    if (adminData) {
+      adminData.forEach((data) => {
+        if (data.username == userEmail) return true;
+      });
+    }
+    return false;
+  } catch (error) {
+    console.error("Error Checking Admin Users: ", error.code, error.message);
+  }
+};
 
 function ShowPassword() {
   var x = document.getElementById("password");

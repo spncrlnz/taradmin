@@ -8,18 +8,11 @@
     <title>T.A.R. Dashboard</title>
 
     <link rel="icon" href="images/icon_logo.png" type="image/x-icon" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/PendApp.css" />
 
+    <script src="https://kit.fontawesome.com/6f40c2c1f0.js" crossorigin="anonymous" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script
-      src="https://kit.fontawesome.com/6f40c2c1f0.js"
-      crossorigin="anonymous"
-      defer
-    ></script>
   </head>
 
   <body>
@@ -31,12 +24,7 @@
           <div class="h-100">
             <div class="sidebar-logo">
               <a href="#">
-                <img
-                  src="images/icon_logo.png"
-                  style="width: auto; height: 60px; max-height: 120px"
-                  alt="Logo"
-                  srcset=""
-                />
+                <img src="images/icon_logo.png" style="width: auto; height: 60px; max-height: 120px" alt="Logo" />
                 Tap and Repair
               </a>
               <ul class="sidebar-nav">
@@ -99,7 +87,7 @@
                   <a href="Reports.html" class="sidebar-link">
                     <i class="fa-solid fa-file-pen"></i>
                     Reports
-                  </a>
+                  </b>
                 </li>
 
                 <!--Log Out-->
@@ -124,37 +112,27 @@
           <main class="content px-3 py-2">
             <div class="container-fluid">
               <div class="mb-3">
-                <h4>Approved Shop Owners</h4>
+                <h4>Audit Logs</h4>
               </div>
 
               <!--Data Table-->
               <div class="card border-0">
-                <!-- <div class="card-header">
-                <h5 class="card-title">
-                    Basic Table
-                </h5>
-                <h6 class="card-subtitle text-muted">
-                    Lorepm ipsum akjhdkjik askjdh asdfafdawef asdfaweddd asdfaweewqads 
-                </h6>
-              </div> -->
                 <div class="card-body">
                   <table class="table">
                     <thead
-                      class="table-dark table-bordered align-items-center mb-0"
-                    >
+                      class="table-dark table-bordered align-items-center mb-0" >
                       <tr
-                        class="text-uppercase text-nonwrap text-xxs font-weight-bolder ps-2"
-                      >
-                        <th>Full Name</th>
-                        <th>E-Mail</th>
-                        <th>Number</th>
-                        <th>Approved</th>
-                        <th>Document</th>
-                        <th>Location</th>
-                        <th>Terminate</th>
+                        class="text-uppercase text-nonwrap text-xxs font-weight-bolder ps-2" >
+                        <th>Timestamp</th>
+                        <th>Updated By</th>
+                        <th>Action</th>
+                        <th>Field Changed</th>
+                        <th>Old Value</th>
+                        <th>New Value</th>
                       </tr>
                     </thead>
-                    <tbody class="table-cotent" id="table-content"></tbody>
+                    <tbody class="table-cotent" id="table-content">
+                    </tbody>
                   </table>
                 </div>
               </div>
@@ -162,6 +140,25 @@
           </main>
         </div>
       </div>
+    </div>
+
+    <!--Opening Document/ID-->
+    <div class="modal fade" id="modalDocument" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel"></h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="docs"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
 
     <!--Collapsible Button for Sidebar-->
@@ -178,15 +175,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
 
     <!--Email Send Library-->
-    <script
-      type="text/javascript"
-      src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
-    ></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <!--Separate JavaScript File Connection for Firebase-->
-    <script src="js/mainContent.js"></script>
-    <script>
-      dataQuery = "ApprSO";
-    </script>
+    <script src="js/AuditLogsController.js"></script>
+
   </body>
 </html>
