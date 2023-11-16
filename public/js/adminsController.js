@@ -222,13 +222,17 @@ let saveUpdateForm = (updateAction) => {
       fullname: fullnameVal,
       username: usernameVal,
     };
-    ref.set(newAdmin);
-    while (tableParent.firstChild) {
-      tableParent.firstChild.remove();
+    if (usernameVal && fullnameVal) {
+      ref.set(newAdmin);
+      while (tableParent.firstChild) {
+        tableParent.firstChild.remove();
+      }
+      retrieveAdmins();
+      closeUpdateForm();
+      ctr = 0;
+    } else {
+      console.log("idiot");
     }
-    ctr = 0;
-    retrieveAdmins();
-    closeUpdateForm();
   }
 };
 
