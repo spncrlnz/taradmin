@@ -11,242 +11,343 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-let database = firebase.database();
-let adminRef = database.ref("admins");
+const DATABASE = firebase.database();
+const ADMINREF = DATABASE.ref("admins");
+
+let dataTable = document.getElementById("table-content");
 let adminData = [];
-let tableParent = document.querySelector(".dataTable");
-let selectedCheckBox;
-let checkBoxSelected = false;
+
+// Function for Retrieving Admin Data
+let GetAdminData = async () => {
+  adminData = [];
+  while (dataTable.hasChildNodes()) {
+    dataTable.removeChild(dataTable.firstChild);
+  }
+  try {
+    const adminSnapshot = await ADMINREF.once("value");
+    let adminKeys = Object.keys(adminSnapshot.val());
+    let adminValues = adminSnapshot.val();
+    for (let i = 0; i <= adminKeys[adminKeys.length - 1]; i++) {
+      if (adminKeys.includes(i.toString())) {
+        adminData.push(adminValues[i]);
+      } else adminData.push(undefined);
+    }
+    console.log(adminData);
+    LoadTableRows();
+  } catch (error) {
+    console.error("Error Retriveving Admin Data : ", error);
+  }
+};
+
+// Function for Creating Rows in the Table
+let LoadTableRows = async () => {
+  let userRef = DATABASE.ref("users");
+  let userSnapshot = await userRef.once("value");
+  let userData = Object.values(userSnapshot.val());
+  for (let i = 0; i < adminData.length; i++) {
+    if (adminData[i]) {
+      let adminFullName;
+      for (let j = 0; j < userData.length; j++) {
+        if (userData[j].email == adminData[i].username) {
+          adminFullName = userData[j].fullname;
+        }
+      }
+      let row = document.createElement("tr");
+      let checkBoxItem = document.createElement("th");
+      let emailItem = document.createElement("th");
+      let roleItem = document.createElement("th");
+      let fullnameItem = document.createElement("th");
+      let checkBoxText = document.createElement("input");
+      let emailText = document.createTextNode(adminData[i].username);
+      let roleText = document.createTextNode(adminData[i].role);
+      let fullnameText = document.createTextNode(adminFullName);
+
+      checkBoxText.id = "adminCheckBox" + i;
+      checkBoxText.type = "checkbox";
+      checkBoxItem.addEventListener("change", (e) => {
+        checkBoxChecked(e);
+      });
+      checkBoxItem.appendChild(checkBoxText);
+      emailItem.appendChild(emailText);
+      fullnameItem.appendChild(fullnameText);
+      roleItem.appendChild(roleText);
+      row.appendChild(checkBoxItem);
+      row.appendChild(emailItem);
+      row.appendChild(fullnameItem);
+      row.appendChild(roleItem);
+      dataTable.appendChild(row);
+    }
+  }
+};
+
+// Top Right Buttons Controllers
+let pageContainer = document.getElementById("pageContainer");
 let createButton = document.getElementById("createButton");
 let updateButton = document.getElementById("updateButton");
 let deleteButton = document.getElementById("deleteButton");
-let buttonMargin = "margin-left: 10px;";
-createButton.setAttribute("style", buttonMargin + "cursor: pointer");
-createButton.setAttribute("onclick", "createForm()");
-updateButton.setAttribute("style", buttonMargin + "color: grey;");
-deleteButton.setAttribute("style", buttonMargin + "color: grey;");
-let updateContainer;
-let ctr = 0;
 
-let retrieveAdmins = async () => {
-  try {
-    const snapshot = await adminRef.once("value");
-    adminData = snapshot.val();
-    adminData = Object.values(adminData);
-    if (adminData) {
-      let index = 0;
-      adminData.forEach((data) => {
-        let row = document.createElement("tr");
-        let checkBoxes = document.createElement("input");
-        checkBoxes.setAttribute("type", "checkbox");
-        checkBoxes.setAttribute("id", "checkbox" + index);
-        checkBoxes.setAttribute("class", "checkbox");
-        checkBoxes.addEventListener("change", (e) => {
-          checkBoxTicked(e);
-        });
-        tableParent.appendChild(row);
-        createRows(data, row, checkBoxes);
-        index += 1;
-      });
-    } else {
-      let row = document.createElement("tr");
-      let rowItem = document.createElement("th");
-      let rowItemText = document.createTextNode("No Available Data");
-      tableParent.appendChild(row);
-      row.appendChild(rowItem);
-      rowItem.appendChild(rowItemText);
+createButton.style.marginRight = "10px";
+updateButton.style.marginRight = "10px";
+updateButton.style.color = "gray";
+deleteButton.style.color = "gray";
+
+createButton.style.cursor = "pointer";
+createButton.onclick = createWindow;
+
+async function createWindow() {
+  const usersRef = DATABASE.ref("users");
+  const usersSnapshot = await usersRef.once("value");
+  let usersData = usersSnapshot.val();
+  usersData = Object.values(usersData);
+  let usersEmails = [];
+  let usersType = [];
+  let usersFullname = [];
+  let adminEmails = [];
+  for (i = 0; i < adminData.length; i++) {
+    if (adminData[i]) adminEmails.push(adminData[i].username);
+  }
+
+  for (i = 0; i < usersData.length; i++) {
+    if (!adminEmails.includes(usersData[i].email)) {
+      usersEmails.push(usersData[i].email);
+      usersType.push(usersData[i].usertype);
+      usersFullname.push(usersData[i].fullname);
     }
-  } catch (error) {
-    console.error("Error retrieving admin data: ", error.code, error.message);
   }
-};
 
-let createRows = async (data, row, checkBox) => {
-  ctr += 1;
-  let dataArray = [checkBox, data.username, data.fullname, data.roles];
-  dataArray.forEach((element) => {
-    if (element != checkBox) {
-      let rowItem = document.createElement("th");
-      row.appendChild(rowItem);
-      let rowItemText = document.createTextNode(element);
-      rowItem.appendChild(rowItemText);
-    } else {
-      let rowItem = document.createElement("th");
-      row.appendChild(rowItem);
-      rowItem.appendChild(checkBox);
+  let roleRef = DATABASE.ref("roles");
+  let roleSnapshot = await roleRef.once("value");
+  let roleData = Object.values(roleSnapshot.val());
+
+  let createWindowContainer = document.createElement("div");
+  let createWindowBackground = document.createElement("div");
+  let createWindowNameContainer = document.createElement("div");
+  let createWindowEmailContainer = document.createElement("div");
+  let createWindowRoleContainer = document.createElement("div");
+  let createWindowNameField = document.createElement("input");
+  let createWindowNameLabel = document.createTextNode("Name:");
+  let createWindowEmailField = document.createElement("select");
+  let createWindowEmailLabel = document.createTextNode("Email:");
+  let createWindowRoleField = document.createElement("select");
+  let createWindowRoleLabel = document.createTextNode("Role:");
+  let createWindowRoleDescContainer = document.createElement("div");
+  let createWindowRoleDescField = document.createElement("input");
+  let createWindowRoleDescLabel = document.createTextNode("Description:");
+
+  createWindowEmailField.onchange = selectEmail;
+  createWindowRoleField.onchange = selectRole;
+  createWindowContainer.id = "createWindowContainer";
+  createWindowEmailField.id = "emailField";
+  createWindowNameField.id = "nameField";
+  createWindowRoleField.id = "roleField";
+  createWindowRoleDescField.id = "roleDescField";
+  createWindowNameField.disabled = true;
+  createWindowRoleDescField.disabled = true;
+  createWindowContainer.style.gridArea = "overlap";
+  createWindowContainer.style.zIndex = "99";
+  createWindowContainer.style.height = "100vh";
+  createWindowContainer.style.width = "100vw";
+  createWindowContainer.style.display = "flex";
+  createWindowContainer.style.alignItems = "center";
+  createWindowContainer.style.justifyContent = "center";
+  createWindowBackground.style.display = "flex";
+  createWindowBackground.style.flexDirection = "column";
+  createWindowBackground.style.width = "500px";
+  createWindowBackground.style.height = "250px";
+  createWindowBackground.style.backgroundColor = "black";
+  createWindowBackground.style.borderRadius = "10px";
+  createWindowBackground.style.padding = "20px";
+  createWindowBackground.style.justifyContent = "center";
+  createWindowNameContainer.style.display = "flex";
+  createWindowNameContainer.style.width = "100%";
+  createWindowNameContainer.style.justifyContent = "space-between";
+  createWindowNameContainer.style.marginBottom = "5px";
+  createWindowNameContainer.style.paddingRight = "20px";
+  createWindowNameContainer.style.paddingLeft = "20px";
+  createWindowEmailContainer.style.display = "flex";
+  createWindowEmailContainer.style.width = "100%";
+  createWindowEmailContainer.style.justifyContent = "space-between";
+  createWindowEmailContainer.style.marginBottom = "5px";
+  createWindowEmailContainer.style.paddingRight = "20px";
+  createWindowEmailContainer.style.paddingLeft = "20px";
+  createWindowRoleContainer.style.display = "flex";
+  createWindowRoleContainer.style.width = "100%";
+  createWindowRoleContainer.style.justifyContent = "space-between";
+  createWindowRoleContainer.style.marginBottom = "5px";
+  createWindowRoleContainer.style.paddingRight = "20px";
+  createWindowRoleContainer.style.paddingLeft = "20px";
+  createWindowRoleDescContainer.style.display = "flex";
+  createWindowRoleDescContainer.style.width = "100%";
+  createWindowRoleDescContainer.style.justifyContent = "space-between";
+  createWindowRoleDescContainer.style.marginBottom = "5px";
+  createWindowRoleDescContainer.style.paddingRight = "20px";
+  createWindowRoleDescContainer.style.paddingLeft = "20px";
+
+  let createWindowButtonContainer = document.createElement("div");
+  let createWindowCreateButton = document.createElement("div");
+  let createWindowCreateText = document.createTextNode("CREATE");
+  let createWindowCancelButton = document.createElement("div");
+  let createWindowCancelText = document.createTextNode("CANCEL");
+
+  createWindowButtonContainer.style.marginTop = "20px";
+  createWindowButtonContainer.style.display = "flex";
+  createWindowButtonContainer.style.width = "100%";
+  createWindowButtonContainer.style.justifyContent = "space-around";
+  createWindowCreateButton.onclick = createCreateWindow;
+  createWindowCancelButton.onclick = cancelCreateWindow;
+
+  createWindowNameContainer.appendChild(createWindowNameLabel);
+  createWindowNameContainer.appendChild(createWindowNameField);
+  createWindowEmailContainer.appendChild(createWindowEmailLabel);
+  createWindowEmailContainer.appendChild(createWindowEmailField);
+  createWindowRoleContainer.appendChild(createWindowRoleLabel);
+  createWindowRoleContainer.appendChild(createWindowRoleField);
+  createWindowRoleDescContainer.appendChild(createWindowRoleDescLabel);
+  createWindowRoleDescContainer.appendChild(createWindowRoleDescField);
+  createWindowCreateButton.appendChild(createWindowCreateText);
+  createWindowCancelButton.appendChild(createWindowCancelText);
+  createWindowButtonContainer.appendChild(createWindowCreateButton);
+  createWindowButtonContainer.appendChild(createWindowCancelButton);
+
+  for (let i = 0; i < usersEmails.length; i++) {
+    if (i == 0) {
+      let blankText = document.createTextNode("");
+      let blankOption = document.createElement("option");
+      blankOption.value = "";
+      blankOption.appendChild(blankText);
+      createWindowEmailField.appendChild(blankOption);
     }
-  });
-};
-
-let checkBoxTicked = (e) => {
-  let id = e.target.id.toString();
-  let index = id.charAt(id.length - 1);
-  if (selectedCheckBox != document.getElementById(id)) {
-    if (selectedCheckBox) {
-      selectedCheckBox.checked = false;
-      selectedCheckBox = document.getElementById(id);
-    } else selectedCheckBox = document.getElementById(id);
-
-    //Update Button
-    updateButton.setAttribute(
-      "style",
-      buttonMargin + "color: white; cursor: pointer;"
-    );
-    updateButton.setAttribute("onclick", "updateForm(" + index + ")");
-    deleteButton.setAttribute(
-      "style",
-      buttonMargin + "color: white; cursor: pointer;"
-    );
-    deleteButton.setAttribute("onclick", "deleteForm(" + index + ")");
-  } else {
-    selectedCheckBox = null;
-    updateButton.setAttribute("style", buttonMargin + "color: grey;");
-    deleteButton.setAttribute("style", buttonMargin + "color: grey;");
+    let emailText = document.createTextNode(usersEmails[i]);
+    let emailOption = document.createElement("option");
+    emailOption.value = usersEmails[i];
+    emailOption.appendChild(emailText);
+    createWindowEmailField.appendChild(emailOption);
   }
-};
 
-let deleteForm = async (index) => {
-  try {
-    let adminRef = firebase.database().ref("admins/" + index);
-    await adminRef.remove();
-    let row = document.getElementById("checkbox" + index).parentNode.parentNode;
-    row.remove();
-  } catch (error) {
-    console.error("Error on retrieving user data: ", error.code, error.message);
+  for (let i = 0; i < roleData.length; i++) {
+    if (i == 0) {
+      let blankText = document.createTextNode("");
+      let blankOption = document.createElement("option");
+      blankOption.value = "";
+      blankOption.appendChild(blankText);
+      createWindowRoleField.appendChild(blankOption);
+    }
+    let roleText = document.createTextNode(roleData[i].name);
+    let roleOption = document.createElement("option");
+    roleOption.value = roleData[i].name;
+    roleOption.appendChild(roleText);
+    createWindowRoleField.appendChild(roleOption);
   }
-};
+  createWindowEmailField.style.width = "182.88px";
+  createWindowEmailField.style.height = "25.19px";
+  createWindowRoleField.style.width = "182.88px";
+  createWindowRoleField.style.height = "25.19px";
+  createWindowBackground.appendChild(createWindowEmailContainer);
+  createWindowBackground.appendChild(createWindowNameContainer);
+  createWindowBackground.appendChild(createWindowRoleContainer);
+  createWindowBackground.appendChild(createWindowRoleDescContainer);
+  createWindowBackground.appendChild(createWindowButtonContainer);
+  createWindowContainer.appendChild(createWindowBackground);
+  pageContainer.appendChild(createWindowContainer);
+}
 
-let updateForm = async (index) => {
-  try {
-    let adminRef = firebase.database().ref("admins/" + index);
-    let snapshot = await adminRef.once("value");
-    let admin = snapshot.val();
-
-    updateCreateForm(true, admin);
-  } catch (error) {
-    console.error("Error on retrieving user data: ", error.code, error.message);
-  }
-};
-
-let createForm = () => {
-  updateCreateForm(false);
-};
-
-let updateCreateForm = (updateAction, admin) => {
-  let pageContainer = document.getElementById("pageContainer");
-  updateContainer = document.createElement("div");
-  let updateContainerStyle =
-    "grid-area: overlap; height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; color: black; z-index: 99";
-  updateContainer.setAttribute("style", updateContainerStyle);
-  let updateBackground = document.createElement("div");
-  let updateBackgroundStyle =
-    "background-color: #333; padding: 20px; height: fit-content; width: fit-content; border-radius: 10px; color: #e9ecef";
-  updateBackground.setAttribute("style", updateBackgroundStyle);
-
-  let fullNameSection = document.createElement("div");
-  fullNameSection.setAttribute("class", "input-field");
-  fullNameSection.setAttribute(
-    "style",
-    "display: flex; justify-content: space-between; margin-bottom: 10px"
-  );
-  let fullNameField = document.createElement("input");
-  fullNameField.setAttribute("class", "input");
-  fullNameField.setAttribute("id", "fullName");
-  fullNameField.setAttribute("style", "margin-left: 20px");
-  let fullNameLabel = document.createElement("label");
-  fullNameLabel.setAttribute("for", "fullName");
-  fullNameLabel.setAttribute("class", "fullName");
-  let fullNameText = document.createTextNode("Full Name: ");
-  fullNameLabel.appendChild(fullNameText);
-  fullNameSection.appendChild(fullNameLabel);
-  fullNameSection.appendChild(fullNameField);
-  updateBackground.appendChild(fullNameSection);
-
-  let usernameSection = document.createElement("div");
-  usernameSection.setAttribute("class", "input-field");
-  usernameSection.setAttribute(
-    "style",
-    "display: flex; justify-content: space-between"
-  );
-  let usernameField = document.createElement("input");
-  usernameField.setAttribute("class", "input");
-  usernameField.setAttribute("id", "username");
-  usernameField.setAttribute("style", "margin-left: 20px");
-  let usernameLabel = document.createElement("label");
-  usernameLabel.setAttribute("for", "username");
-  usernameLabel.setAttribute("class", "username");
-  let usernameText = document.createTextNode("Email/Username: ");
-  usernameLabel.appendChild(usernameText);
-  usernameSection.appendChild(usernameLabel);
-  usernameSection.appendChild(usernameField);
-  updateBackground.appendChild(usernameSection);
-
-  let buttonSection = document.createElement("div");
-  buttonSection.setAttribute(
-    "style",
-    "display: flex; justify-content: space-around; margin-top: 40px; font-size: 20px"
-  );
-  let saveButton = document.createElement("div");
-  saveButton.setAttribute("style", "cursor: pointer;");
-  saveButton.setAttribute("onclick", "saveUpdateForm(" + updateAction + ")");
-  let closeButton = document.createElement("div");
-  closeButton.setAttribute("style", "cursor: pointer;");
-  closeButton.setAttribute("onclick", "closeUpdateForm(updateContainer)");
-  let saveText = document.createTextNode("SAVE");
-  let closeText = document.createTextNode("CLOSE");
-  saveButton.appendChild(saveText);
-  closeButton.appendChild(closeText);
-  buttonSection.appendChild(saveButton);
-  buttonSection.appendChild(closeButton);
-  updateBackground.appendChild(buttonSection);
-
-  let inputSections = document.getElementsByClassName("input-field");
-
-  updateContainer.appendChild(updateBackground);
-  pageContainer.appendChild(updateContainer);
-
-  if (updateAction) {
-    fullNameField.setAttribute("readonly", "true");
-    usernameField.setAttribute("readonly", "true");
-    fullNameField.setAttribute("value", admin.fullname);
-    usernameField.setAttribute("value", admin.username);
-  }
-};
-
-let saveUpdateForm = (updateAction) => {
-  if (!updateAction) {
-    let ref = database.ref("admins/" + ctr);
-    let usernameVal = document.getElementById("username").value;
-    let fullnameVal = document.getElementById("fullName").value;
-    let newAdmin = {
-      fullname: fullnameVal,
-      username: usernameVal,
+let createCreateWindow = async () => {
+  let adminUsernameField = document.getElementById("emailField");
+  let adminRoleField = document.getElementById("roleField");
+  let adminUsername = adminUsernameField.value;
+  let adminRole = adminRoleField.value;
+  if (adminUsername && adminRole) {
+    let createAdminRef = DATABASE.ref("admins/" + adminData.length);
+    let createAdminData = {
+      username: adminUsername,
+      role: adminRole,
     };
-    if (usernameVal && fullnameVal) {
-      ref.set(newAdmin);
-      while (tableParent.firstChild) {
-        tableParent.firstChild.remove();
-      }
-      retrieveAdmins();
-      closeUpdateForm();
-      ctr = 0;
+    await createAdminRef.set(createAdminData);
+    cancelCreateWindow();
+    GetAdminData();
+  }
+};
+
+let cancelCreateWindow = () => {
+  let createWindowContainer = document.getElementById("createWindowContainer");
+  createWindowContainer.remove();
+};
+
+let selectEmail = async () => {
+  let emailField = document.getElementById("emailField");
+  let emailVal = emailField.value;
+  let usersRef = DATABASE.ref("users");
+  let usersSnapshot = await usersRef.once("value");
+  let usersData = usersSnapshot.val();
+  usersData = Object.values(usersData);
+  let userEmails = [];
+  for (let i = 0; i < usersData.length; i++) {
+    userEmails[i] = usersData[i].email;
+  }
+  let nameField = document.getElementById("nameField");
+  let index = userEmails.indexOf(emailVal);
+  let nameVal;
+  if (emailVal) {
+    nameVal = usersData[index].fullname;
+  } else {
+    nameVal = "";
+  }
+  nameField.value = nameVal;
+};
+
+let selectRole = async () => {
+  let roleNameField = document.getElementById("roleField");
+  let roleDescField = document.getElementById("roleDescField");
+  let roleRef = DATABASE.ref("roles");
+  let roleSnapshot = await roleRef.once("value");
+  let roleData = Object.values(roleSnapshot.val());
+  let roleName = [];
+  let roleDesc = [];
+  for (let i = 0; i < roleData.length; i++) {
+    roleName.push(roleData[i].name);
+    roleDesc.push(roleData[i].description);
+  }
+  let index = roleName.indexOf(roleNameField.value);
+  roleDescField.value = roleDesc[index];
+};
+
+let deleteRecord = async () => {
+  try {
+    const deleteAdminRef = DATABASE.ref("admins/" + itemSelected.slice(13));
+    deleteAdminRef.remove();
+    GetAdminData();
+  } catch (error) {
+    console.error("Error Deleting Record : ", error.code, error.message);
+  }
+};
+
+// Check Box Controllers
+let anItemIsSelected = false;
+let itemSelected = "";
+
+let checkBoxChecked = (e) => {
+  if (itemSelected == "") {
+    itemSelected = e.target.id;
+    updateButton.style.color = "white";
+    deleteButton.style.color = "white";
+    updateButton.style.cursor = "pointer";
+    deleteButton.style.cursor = "pointer";
+    deleteButton.setAttribute("onclick", "deleteRecord()");
+  } else {
+    let temp = itemSelected;
+    itemSelected = e.target.id;
+    if (temp == itemSelected) {
+      updateButton.style.color = "gray";
+      deleteButton.style.color = "gray";
+      updateButton.style.cursor = "default";
+      deleteButton.style.cursor = "default";
+      deleteButton.setAttribute("onclick", "");
+      itemSelected = "";
     } else {
-      console.log("idiot");
+      document.getElementById(temp).checked = false;
+      itemSelected = e.target.id;
     }
   }
 };
 
-let closeUpdateForm = () => {
-  updateContainer.remove();
-};
-
-let updateAdmin = async (ref, data) => {
-  try {
-    ref.set(data);
-    console.log("Update Successful");
-  } catch (error) {
-    console.error("Error in updating user data: ", error.code, error.message);
-  }
-};
-
-retrieveAdmins();
+GetAdminData();

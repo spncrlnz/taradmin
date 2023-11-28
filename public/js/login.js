@@ -44,11 +44,13 @@ let Login = async () => {
   firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
+    .then(async (userCredential) => {
       let user = userCredential.user;
-      let userIsAdmin = checkAdmin(user.email);
-      if (userIsAdmin) window.open("PendCust.html", "_self");
-      else {
+      let userIsAdmin = await checkAdmin(user.email);
+      if (userIsAdmin) {
+        window.open("PendCust.html", "_self");
+      } else {
+        loginError();
       }
     })
     .catch((error) => {
@@ -67,19 +69,21 @@ let loginError = () => {
 };
 
 let checkAdmin = async (userEmail) => {
+  let returnValue = false;
   try {
     const snapshot = await adminsRef.once("value");
+    console.log(userEmail);
     adminData = snapshot.val();
     adminData = Object.values(adminData);
     if (adminData) {
       adminData.forEach((data) => {
-        if (data.username == userEmail) return true;
+        if (data.username == userEmail) returnValue = true;
       });
     }
-    return false;
   } catch (error) {
     console.error("Error Checking Admin Users: ", error.code, error.message);
   }
+  return returnValue;
 };
 
 function ShowPassword() {
