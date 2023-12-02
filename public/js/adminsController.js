@@ -17,6 +17,49 @@ const ADMINREF = DATABASE.ref("admins");
 let dataTable = document.getElementById("table-content");
 let adminData = [];
 
+const urlParams = new URLSearchParams(window.location.search);
+const adminRole = urlParams.get("user-role");
+
+let usersContainer = document.getElementById("users");
+let pendingCustomerButton = document.getElementById("pending-customer");
+let pendingMechanicButton = document.getElementById("pending-mechanic");
+let pendingShopButton = document.getElementById("pending-shop");
+let approvedCustomerButton = document.getElementById("approved-customer");
+let approvedMechanicButton = document.getElementById("approved-mechanic");
+let approvedShopButton = document.getElementById("approved-shop");
+let adminUsers = document.getElementById("users-admin");
+let reportsUser = document.getElementById("users-reports");
+
+pendingCustomerButton.onclick = () => {
+  window.open("PendCust.html?user-role=" + adminRole, "_self");
+};
+pendingMechanicButton.onclick = () => {
+  window.open("PendMech.html?user-role=" + adminRole, "_self");
+};
+pendingShopButton.onclick = () => {
+  window.open("PendSO.html?user-role=" + adminRole, "_self");
+};
+approvedCustomerButton.onclick = () => {
+  window.open("ApprCust.html?user-role=" + adminRole, "_self");
+};
+approvedMechanicButton.onclick = () => {
+  window.open("ApprMech.html?user-role=" + adminRole, "_self");
+};
+approvedShopButton.onclick = () => {
+  window.open("ApprSO.html?user-role=" + adminRole, "_self");
+};
+adminUsers.onclick = () => {
+  window.open("Admins.html?user-role=" + adminRole, "_self");
+};
+reportsUser.onclick = () => {
+  window.open("Reports.html?user-role=" + adminRole, "_self");
+};
+
+if (adminRole != "superuser") {
+  usersContainer.remove();
+  adminUsers.remove();
+}
+
 // Function for Retrieving Admin Data
 let GetAdminData = async () => {
   adminData = [];
@@ -26,13 +69,13 @@ let GetAdminData = async () => {
   try {
     const adminSnapshot = await ADMINREF.once("value");
     let adminKeys = Object.keys(adminSnapshot.val());
+    console.log(adminKeys);
     let adminValues = adminSnapshot.val();
     for (let i = 0; i <= adminKeys[adminKeys.length - 1]; i++) {
       if (adminKeys.includes(i.toString())) {
         adminData.push(adminValues[i]);
       } else adminData.push(undefined);
     }
-    console.log(adminData);
     LoadTableRows();
   } catch (error) {
     console.error("Error Retriveving Admin Data : ", error);
@@ -85,11 +128,14 @@ let pageContainer = document.getElementById("pageContainer");
 let createButton = document.getElementById("createButton");
 let updateButton = document.getElementById("updateButton");
 let deleteButton = document.getElementById("deleteButton");
+let auditLogsButton = document.getElementById("auditLogs");
 
 createButton.style.marginRight = "10px";
 updateButton.style.marginRight = "10px";
+deleteButton.style.marginRight = "10px";
 updateButton.style.color = "gray";
 deleteButton.style.color = "gray";
+auditLogsButton.style.color = "gray";
 
 createButton.style.cursor = "pointer";
 createButton.onclick = createWindow;
@@ -139,7 +185,7 @@ async function createWindow() {
   createWindowContainer.id = "createWindowContainer";
   createWindowEmailField.id = "emailField";
   createWindowNameField.id = "nameField";
-  createWindowRoleField.id = "roleField";
+  createWindowRoleField.id = "roleNameField";
   createWindowRoleDescField.id = "roleDescField";
   createWindowNameField.disabled = true;
   createWindowRoleDescField.disabled = true;
@@ -193,6 +239,8 @@ async function createWindow() {
   createWindowButtonContainer.style.display = "flex";
   createWindowButtonContainer.style.width = "100%";
   createWindowButtonContainer.style.justifyContent = "space-around";
+  createWindowCreateButton.style.cursor = "pointer";
+  createWindowCancelButton.style.cursor = "pointer";
   createWindowCreateButton.onclick = createCreateWindow;
   createWindowCancelButton.onclick = cancelCreateWindow;
 
@@ -251,9 +299,48 @@ async function createWindow() {
   pageContainer.appendChild(createWindowContainer);
 }
 
+let displayTime = () => {
+  let str = "";
+
+  let currentTime = new Date();
+  let day = currentTime.getDate();
+  let month = currentTime.getMonth();
+  let year = currentTime.getFullYear();
+  let hours = currentTime.getHours();
+  let minutes = currentTime.getMinutes();
+  let seconds = currentTime.getSeconds();
+
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+  }
+  if (seconds < 10) {
+    seconds = "0" + seconds;
+  }
+  str +=
+    month +
+    1 +
+    "/" +
+    day +
+    "/" +
+    year +
+    " " +
+    hours +
+    ":" +
+    minutes +
+    ":" +
+    seconds +
+    " ";
+  if (hours > 11) {
+    str += "PM";
+  } else {
+    str += "AM";
+  }
+  return str;
+};
+
 let createCreateWindow = async () => {
   let adminUsernameField = document.getElementById("emailField");
-  let adminRoleField = document.getElementById("roleField");
+  let adminRoleField = document.getElementById("roleNameField");
   let adminUsername = adminUsernameField.value;
   let adminRole = adminRoleField.value;
   if (adminUsername && adminRole) {
@@ -261,6 +348,12 @@ let createCreateWindow = async () => {
     let createAdminData = {
       username: adminUsername,
       role: adminRole,
+      logs: {
+        0: {
+          action: "Create",
+          timestamp: displayTime(),
+        },
+      },
     };
     await createAdminRef.set(createAdminData);
     cancelCreateWindow();
@@ -272,6 +365,163 @@ let cancelCreateWindow = () => {
   let createWindowContainer = document.getElementById("createWindowContainer");
   createWindowContainer.remove();
 };
+
+async function updateWindow() {
+  let updateWindowContainer = document.createElement("div");
+  let updateWindowBackground = document.createElement("div");
+  let updateWindowUsernameContainer = document.createElement("div");
+  let updateWindowFullnameContainer = document.createElement("div");
+  let updateWindowRoleNameContainer = document.createElement("div");
+  let updateWindowRoleDescContainer = document.createElement("div");
+  let updateWindowUsernameField = document.createElement("input");
+  let updaetWindowUsernameLabel = document.createTextNode("Email:");
+  let updateWindowFullnameField = document.createElement("input");
+  let updateWindowFullnameLabel = document.createTextNode("Name:");
+  let updateWindowRoleNameField = document.createElement("select");
+  let updateWindowRoleNameLabel = document.createTextNode("Role:");
+  let updateWindowRoleDescField = document.createElement("input");
+  let updateWindowRoleDescLabel = document.createTextNode("Description:");
+  let updateWindowButtonContainer = document.createElement("div");
+  let updateWindowUpdateButton = document.createElement("div");
+  let updateWindowUpdateText = document.createTextNode("UPDATE");
+  let updateWindowCancelButton = document.createElement("div");
+  let updateWindowCancelText = document.createTextNode("CANCEL");
+
+  let updateUpdateCancel = () => {
+    updateWindowContainer.remove();
+  };
+
+  let updateUpdateWindow = async () => {
+    let adminForUpdateIndex = itemSelected.slice(13);
+    let adminForUpdateRef = DATABASE.ref("admins/" + adminForUpdateIndex);
+    let adminForUpdateData = {
+      username: updateWindowUsernameField.value,
+      role: updateWindowRoleNameField.value,
+    };
+    adminForUpdateRef.set(adminForUpdateData);
+    updateUpdateCancel();
+    GetAdminData();
+    itemSelected = "";
+  };
+
+  updateWindowUsernameContainer.appendChild(updaetWindowUsernameLabel);
+  updateWindowUsernameContainer.appendChild(updateWindowUsernameField);
+  updateWindowFullnameContainer.appendChild(updateWindowFullnameLabel);
+  updateWindowFullnameContainer.appendChild(updateWindowFullnameField);
+  updateWindowRoleNameContainer.appendChild(updateWindowRoleNameLabel);
+  updateWindowRoleNameContainer.appendChild(updateWindowRoleNameField);
+  updateWindowRoleDescContainer.appendChild(updateWindowRoleDescLabel);
+  updateWindowRoleDescContainer.appendChild(updateWindowRoleDescField);
+  updateWindowBackground.appendChild(updateWindowUsernameContainer);
+  updateWindowBackground.appendChild(updateWindowFullnameContainer);
+  updateWindowBackground.appendChild(updateWindowRoleNameContainer);
+  updateWindowBackground.appendChild(updateWindowRoleDescContainer);
+  updateWindowContainer.appendChild(updateWindowBackground);
+  updateWindowUpdateButton.appendChild(updateWindowUpdateText);
+  updateWindowCancelButton.appendChild(updateWindowCancelText);
+  updateWindowButtonContainer.appendChild(updateWindowUpdateButton);
+  updateWindowButtonContainer.appendChild(updateWindowCancelButton);
+  updateWindowBackground.appendChild(updateWindowButtonContainer);
+  pageContainer.appendChild(updateWindowContainer);
+
+  updateWindowRoleNameField.onchange = selectRole;
+  updateWindowContainer.id = "createWindowContainer";
+  updateWindowUsernameField.id = "usernameField";
+  updateWindowFullnameField.id = "fullnameField";
+  updateWindowRoleNameField.id = "roleNameField";
+  updateWindowRoleDescField.id = "roleDescField";
+  updateWindowUsernameField.disabled = true;
+  updateWindowFullnameField.disabled = true;
+  updateWindowRoleDescField.disabled = true;
+  updateWindowRoleNameField.style.width = "182.88px";
+  updateWindowRoleNameField.style.height = "25.19px";
+  updateWindowContainer.style.gridArea = "overlap";
+  updateWindowContainer.style.zIndex = "99";
+  updateWindowContainer.style.height = "100vh";
+  updateWindowContainer.style.width = "100vw";
+  updateWindowContainer.style.display = "flex";
+  updateWindowContainer.style.alignItems = "center";
+  updateWindowContainer.style.justifyContent = "center";
+  updateWindowBackground.style.display = "flex";
+  updateWindowBackground.style.flexDirection = "column";
+  updateWindowBackground.style.width = "500px";
+  updateWindowBackground.style.height = "250px";
+  updateWindowBackground.style.backgroundColor = "black";
+  updateWindowBackground.style.borderRadius = "10px";
+  updateWindowBackground.style.padding = "20px";
+  updateWindowBackground.style.justifyContent = "center";
+  updateWindowUsernameContainer.style.display = "flex";
+  updateWindowUsernameContainer.style.width = "100%";
+  updateWindowUsernameContainer.style.justifyContent = "space-between";
+  updateWindowUsernameContainer.style.marginBottom = "5px";
+  updateWindowUsernameContainer.style.paddingRight = "20px";
+  updateWindowUsernameContainer.style.paddingLeft = "20px";
+  updateWindowFullnameContainer.style.display = "flex";
+  updateWindowFullnameContainer.style.width = "100%";
+  updateWindowFullnameContainer.style.justifyContent = "space-between";
+  updateWindowFullnameContainer.style.marginBottom = "5px";
+  updateWindowFullnameContainer.style.paddingRight = "20px";
+  updateWindowFullnameContainer.style.paddingLeft = "20px";
+  updateWindowRoleNameContainer.style.display = "flex";
+  updateWindowRoleNameContainer.style.width = "100%";
+  updateWindowRoleNameContainer.style.justifyContent = "space-between";
+  updateWindowRoleNameContainer.style.marginBottom = "5px";
+  updateWindowRoleNameContainer.style.paddingRight = "20px";
+  updateWindowRoleNameContainer.style.paddingLeft = "20px";
+  updateWindowRoleDescContainer.style.display = "flex";
+  updateWindowRoleDescContainer.style.width = "100%";
+  updateWindowRoleDescContainer.style.justifyContent = "space-between";
+  updateWindowRoleDescContainer.style.marginBottom = "5px";
+  updateWindowRoleDescContainer.style.paddingRight = "20px";
+  updateWindowRoleDescContainer.style.paddingLeft = "20px";
+  updateWindowButtonContainer.style.marginTop = "20px";
+  updateWindowButtonContainer.style.display = "flex";
+  updateWindowButtonContainer.style.width = "100%";
+  updateWindowButtonContainer.style.justifyContent = "space-around";
+  updateWindowUpdateButton.style.cursor = "pointer";
+  updateWindowCancelButton.style.cursor = "pointer";
+  updateWindowUpdateButton.onclick = updateUpdateWindow;
+  updateWindowCancelButton.onclick = updateUpdateCancel;
+
+  let userRef = DATABASE.ref("users");
+  let userSnapshot = await userRef.once("value");
+  let userData = Object.values(userSnapshot.val());
+  let userFullname = [];
+  let userEmail = [];
+  let updateAdminData = adminData[itemSelected.slice(13)];
+  let rolesRef = DATABASE.ref("roles");
+  let rolesSnapshot = await rolesRef.once("value");
+  let rolesData = Object.values(rolesSnapshot.val());
+  let selectedRoleIndex;
+  let selectedRoleDesc;
+  let roleNames = [];
+  let roleDesc = [];
+
+  for (let i = 0; i < userData.length; i++) {
+    userFullname.push(userData[i].fullname);
+    userEmail.push(userData[i].email);
+  }
+
+  let userIndex = userEmail.indexOf(updateAdminData.username);
+
+  for (let i = 0; i < rolesData.length; i++) {
+    let roleOption = document.createElement("option");
+    let roleText = document.createTextNode(rolesData[i].name);
+    roleOption.appendChild(roleText);
+    roleOption.value = rolesData[i].name;
+    updateWindowRoleNameField.appendChild(roleOption);
+    roleNames.push(rolesData[i].name);
+    roleDesc.push(rolesData[i].description);
+  }
+
+  selectedRoleIndex = roleNames.indexOf(updateAdminData.role);
+  selectedRoleDesc = roleDesc[selectedRoleIndex];
+
+  updateWindowUsernameField.value = updateAdminData.username;
+  updateWindowFullnameField.value = userFullname[userIndex];
+  updateWindowRoleNameField.value = updateAdminData.role;
+  updateWindowRoleDescField.value = selectedRoleDesc;
+}
 
 let selectEmail = async () => {
   let emailField = document.getElementById("emailField");
@@ -296,7 +546,7 @@ let selectEmail = async () => {
 };
 
 let selectRole = async () => {
-  let roleNameField = document.getElementById("roleField");
+  let roleNameField = document.getElementById("roleNameField");
   let roleDescField = document.getElementById("roleDescField");
   let roleRef = DATABASE.ref("roles");
   let roleSnapshot = await roleRef.once("value");
@@ -321,6 +571,73 @@ let deleteRecord = async () => {
   }
 };
 
+let confirmationMessage = async () => {
+  let confirmationContainer = document.createElement("div");
+  let confirmationBackground = document.createElement("div");
+  let confirmationTextContainer = document.createElement("div");
+  let confirmationText = document.createTextNode(
+    "Kindly confirm if you want to delete the user."
+  );
+  let confirmationButtonContainer = document.createElement("div");
+  let proceedButton = document.createElement("div");
+  let proceedText = document.createTextNode("PROCEED");
+  let cancelButton = document.createElement("div");
+  let cancelText = document.createTextNode("CANCEL");
+  let pageContainer = document.getElementById("pageContainer");
+
+  pageContainer.appendChild(confirmationContainer);
+  confirmationContainer.appendChild(confirmationBackground);
+  confirmationBackground.appendChild(confirmationTextContainer);
+  confirmationTextContainer.appendChild(confirmationText);
+  confirmationBackground.appendChild(confirmationButtonContainer);
+  confirmationButtonContainer.appendChild(proceedButton);
+  proceedButton.appendChild(proceedText);
+  confirmationButtonContainer.appendChild(cancelButton);
+  cancelButton.appendChild(cancelText);
+
+  confirmationContainer.style.gridArea = "overlap";
+  confirmationContainer.style.zIndex = "100";
+  confirmationContainer.style.height = "100vh";
+  confirmationContainer.style.width = "100vw";
+  confirmationContainer.style.display = "flex";
+  confirmationContainer.style.alignItems = "center";
+  confirmationContainer.style.justifyContent = "center";
+  confirmationBackground.style.display = "flex";
+  confirmationBackground.style.flexDirection = "column";
+  confirmationBackground.style.width = "600px";
+  confirmationBackground.style.height = "150px";
+  confirmationBackground.style.backgroundColor = "black";
+  confirmationBackground.style.borderRadius = "10px";
+  confirmationBackground.style.padding = "20px";
+  confirmationBackground.style.justifyContent = "space-around";
+  confirmationBackground.style.alignItems = "center";
+  confirmationTextContainer.style.fontSize = "20px";
+  confirmationButtonContainer.style.fontSize = "20px";
+  confirmationButtonContainer.style.display = "flex";
+  confirmationButtonContainer.style.width = "40%";
+  confirmationButtonContainer.style.justifyContent = "space-between";
+  confirmationButtonContainer.style.alignItems = "center";
+  proceedButton.style.cursor = "pointer";
+  cancelButton.style.cursor = "pointer";
+
+  let proceedConfirmation = () => {
+    confirmationContainer.remove();
+    deleteRecord();
+  };
+
+  let cancelConfirmation = () => {
+    confirmationContainer.remove();
+  };
+
+  proceedButton.onclick = proceedConfirmation;
+  cancelButton.onclick = cancelConfirmation;
+};
+
+let auditRoute = () => {
+  window.location.href =
+    "./AuditLogs.html?user-role=" + adminRole + "&data=" + itemSelected;
+};
+
 // Check Box Controllers
 let anItemIsSelected = false;
 let itemSelected = "";
@@ -330,18 +647,26 @@ let checkBoxChecked = (e) => {
     itemSelected = e.target.id;
     updateButton.style.color = "white";
     deleteButton.style.color = "white";
+    auditLogsButton.style.color = "white";
     updateButton.style.cursor = "pointer";
     deleteButton.style.cursor = "pointer";
-    deleteButton.setAttribute("onclick", "deleteRecord()");
+    auditLogsButton.style.cursor = "pointer";
+    updateButton.onclick = updateWindow;
+    deleteButton.onclick = confirmationMessage;
+    auditLogsButton.onclick = auditRoute;
   } else {
     let temp = itemSelected;
     itemSelected = e.target.id;
     if (temp == itemSelected) {
       updateButton.style.color = "gray";
       deleteButton.style.color = "gray";
+      auditLogsButton.style.color = "gray";
       updateButton.style.cursor = "default";
       deleteButton.style.cursor = "default";
-      deleteButton.setAttribute("onclick", "");
+      auditLogsButton.style.cursor = "default";
+      updateButton.onclick = undefined;
+      deleteButton.onclick = undefined;
+      auditLogsButton.onclick = undefined;
       itemSelected = "";
     } else {
       document.getElementById(temp).checked = false;
@@ -349,5 +674,17 @@ let checkBoxChecked = (e) => {
     }
   }
 };
+
+function signout() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch((error) => {
+      alert(error);
+    });
+}
 
 GetAdminData();

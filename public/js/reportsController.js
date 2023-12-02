@@ -16,6 +16,49 @@ let reportsRef = database.ref("reports");
 let reportsData = [];
 let tableParent = document.querySelector(".dataTable");
 
+const urlParams = new URLSearchParams(window.location.search);
+const adminRole = urlParams.get("user-role");
+
+let usersContainer = document.getElementById("users");
+let pendingCustomerButton = document.getElementById("pending-customer");
+let pendingMechanicButton = document.getElementById("pending-mechanic");
+let pendingShopButton = document.getElementById("pending-shop");
+let approvedCustomerButton = document.getElementById("approved-customer");
+let approvedMechanicButton = document.getElementById("approved-mechanic");
+let approvedShopButton = document.getElementById("approved-shop");
+let adminUsers = document.getElementById("users-admin");
+let reportsUser = document.getElementById("users-reports");
+
+pendingCustomerButton.onclick = () => {
+  window.open("PendCust.html?user-role=" + adminRole, "_self");
+};
+pendingMechanicButton.onclick = () => {
+  window.open("PendMech.html?user-role=" + adminRole, "_self");
+};
+pendingShopButton.onclick = () => {
+  window.open("PendSO.html?user-role=" + adminRole, "_self");
+};
+approvedCustomerButton.onclick = () => {
+  window.open("ApprCust.html?user-role=" + adminRole, "_self");
+};
+approvedMechanicButton.onclick = () => {
+  window.open("ApprMech.html?user-role=" + adminRole, "_self");
+};
+approvedShopButton.onclick = () => {
+  window.open("ApprSO.html?user-role=" + adminRole, "_self");
+};
+adminUsers.onclick = () => {
+  window.open("Admins.html?user-role=" + adminRole, "_self");
+};
+reportsUser.onclick = () => {
+  window.open("Reports.html?user-role=" + adminRole, "_self");
+};
+
+if (adminRole != "superuser") {
+  usersContainer.remove();
+  adminUsers.remove();
+}
+
 let retrieveReports = async () => {
   try {
     const snapshot = await reportsRef.once("value");
@@ -36,6 +79,12 @@ let retrieveReports = async () => {
       rowItem.appendChild(rowItemText);
     }
   } catch (error) {
+    let row = document.createElement("tr");
+    let rowItem = document.createElement("th");
+    let rowItemText = document.createTextNode("No Available Data");
+    tableParent.appendChild(row);
+    row.appendChild(rowItem);
+    rowItem.appendChild(rowItemText);
     console.error("Error retrieving reports data:", error);
   }
 };

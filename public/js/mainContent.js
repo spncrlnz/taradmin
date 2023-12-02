@@ -17,6 +17,51 @@ let data;
 let dataChildren = [];
 let dataQuery;
 
+const urlParams = new URLSearchParams(window.location.search);
+const adminRole = urlParams.get("user-role");
+
+let usersContainer = document.getElementById("users");
+let pendingCustomerButton = document.getElementById("pending-customer");
+let pendingMechanicButton = document.getElementById("pending-mechanic");
+let pendingShopButton = document.getElementById("pending-shop");
+let approvedCustomerButton = document.getElementById("approved-customer");
+let approvedMechanicButton = document.getElementById("approved-mechanic");
+let approvedShopButton = document.getElementById("approved-shop");
+let adminUsers = document.getElementById("users-admin");
+let reportsUser = document.getElementById("users-reports");
+
+pendingCustomerButton.onclick = () => {
+  window.open("PendCust.html?user-role=" + adminRole, "_self");
+};
+pendingMechanicButton.onclick = () => {
+  window.open("PendMech.html?user-role=" + adminRole, "_self");
+};
+pendingShopButton.onclick = () => {
+  window.open("PendSO.html?user-role=" + adminRole, "_self");
+};
+approvedCustomerButton.onclick = () => {
+  window.open("ApprCust.html?user-role=" + adminRole, "_self");
+};
+approvedMechanicButton.onclick = () => {
+  window.open("ApprMech.html?user-role=" + adminRole, "_self");
+};
+approvedShopButton.onclick = () => {
+  window.open("ApprSO.html?user-role=" + adminRole, "_self");
+};
+adminUsers.onclick = () => {
+  window.open("Admins.html?user-role=" + adminRole, "_self");
+};
+reportsUser.onclick = () => {
+  window.open("Reports.html?user-role=" + adminRole, "_self");
+};
+
+if (adminRole != "superuser") {
+  usersContainer.remove();
+  adminUsers.remove();
+}
+
+console.log(adminRole);
+
 // User Objects
 let userObject = {
   approved: Boolean,
@@ -687,3 +732,17 @@ function signout() {
       alert(error);
     });
 }
+
+function getCurrentUser() {
+  firebase.auth().onAuthStateChanged(function (user) {
+    if (user) {
+      // User is signed in.
+      console.log(user.uid);
+    } else {
+      // No user is signed in.
+      console.log("No user signed in.");
+    }
+  });
+}
+
+getCurrentUser();

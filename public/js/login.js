@@ -18,29 +18,6 @@ let incorrectLogin = false;
 let Login = async () => {
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
-  /*if (email == "tapandrepairtar@gmail.com" && password == "TARTARus") {
-    email = "frondakd7@gmail.com";
-    password = "Qwerty123@";
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        let user = userCredential.user;
-        console.log("User Signed In: ", user);
-        const snapshot = await;
-        //window.open("PendCust.html", "_self");
-      })
-      .catch((error) => {
-        console.error("Error Singning In: ", error.code, error.message);
-      });
-  } else {
-    if (!incorrectLogin) {
-      let errorContainer = document.getElementById("login-error");
-      let errorText = document.createTextNode("Incorrect Username/Password");
-      errorContainer.appendChild(errorText);
-      incorrectLogin = true;
-    }
-  }*/
   firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
@@ -48,7 +25,8 @@ let Login = async () => {
       let user = userCredential.user;
       let userIsAdmin = await checkAdmin(user.email);
       if (userIsAdmin) {
-        window.open("PendCust.html", "_self");
+        let adminRole = await auditLoginCreate(user.email);
+        window.open("Reports.html?user-role=" + adminRole, "_self");
       } else {
         loginError();
       }
@@ -57,6 +35,81 @@ let Login = async () => {
       console.error("Error Signing In: ", error.code, error.message);
       loginError();
     });
+};
+
+let auditLoginCreate = async (email) => {
+  let adminRecordRef = database.ref("admins");
+  let adminSnapshot = await adminRecordRef.once("value");
+  let adminData = adminSnapshot.val();
+  let adminKeys = Object.keys(adminData);
+  let adminEmails = [];
+  let adminNumber;
+  for (let i = 0; i <= adminKeys[adminKeys.length - 1]; i++) {
+    if (adminKeys.includes(i.toString())) {
+      adminEmails.push(adminData[i].username);
+    } else {
+      adminEmails.push(undefined);
+    }
+  }
+  for (let i = 0; i < adminEmails.length; i++) {
+    if (adminEmails[i] == email) {
+      adminNumber = i;
+    }
+  }
+  let adminLogsRef = database.ref("admins/" + adminNumber.toString() + "/logs");
+  let adminLogsSnapshot = await adminLogsRef.once("value");
+  let adminLogsData = adminLogsSnapshot.val();
+  let newLogsRef = database.ref(
+    "admins/" +
+      adminNumber.toString() +
+      "/logs/" +
+      adminLogsData.length.toString()
+  );
+  let newLogsData = {
+    action: "Log-In",
+    timestamp: displayTime(),
+  };
+  await newLogsRef.set(newLogsData);
+  return adminData[adminNumber].role;
+};
+
+let displayTime = () => {
+  let str = "";
+
+  let currentTime = new Date();
+  let day = currentTime.getDate();
+  let month = currentTime.getMonth();
+  let year = currentTime.getFullYear();
+  let hours = currentTime.getHours();
+  let minutes = currentTime.getMinutes();
+  let seconds = currentTime.getSeconds();
+
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+  }
+  if (seconds < 10) {
+    seconds = "0" + seconds;
+  }
+  str +=
+    month +
+    1 +
+    "/" +
+    day +
+    "/" +
+    year +
+    " " +
+    hours +
+    ":" +
+    minutes +
+    ":" +
+    seconds +
+    " ";
+  if (hours > 11) {
+    str += "PM";
+  } else {
+    str += "AM";
+  }
+  return str;
 };
 
 let loginError = () => {
@@ -72,12 +125,13 @@ let checkAdmin = async (userEmail) => {
   let returnValue = false;
   try {
     const snapshot = await adminsRef.once("value");
-    console.log(userEmail);
     adminData = snapshot.val();
     adminData = Object.values(adminData);
     if (adminData) {
       adminData.forEach((data) => {
-        if (data.username == userEmail) returnValue = true;
+        if (data.username == userEmail) {
+          returnValue = true;
+        }
       });
     }
   } catch (error) {

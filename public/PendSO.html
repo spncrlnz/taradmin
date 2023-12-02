@@ -34,66 +34,68 @@
             </a>
             <ul class="sidebar-nav">
               <!--Pending-->
-              <li class="sidebar-header">Pending</li>
-              <li class="sidebar-item">
-                <a href="PendCust.html" class="sidebar-link">
-                  <i class="fa-solid fa-users"></i>
-                  Customers
-                </a>
-              </li>
-              <li class="sidebar-item">
-                <a href="PendMech.html" class="sidebar-link">
-                  <i class="fa-solid fa-wrench"></i>
-                  Mechanics
-                </a>
-              </li>
-              <li class="sidebar-item">
-                <a href="PendSO.html" class="sidebar-link">
-                  <i class="fa-solid fa-shop"></i>
-                  Shop Owners
-                </a>
-              </li>
-
-              <hr />
-
-              <!--Approved-->
-              <li class="sidebar-header">Approved</li>
-              <li class="sidebar-item">
-                <a href="ApprCust.html" class="sidebar-link">
-                  <i class="fa-solid fa-users"></i>
-                  Customers
-                </a>
-              </li>
-              <li class="sidebar-item">
-                <a href="ApprMech.html" class="sidebar-link">
-                  <i class="fa-solid fa-wrench"></i>
-                  Mechanics
-                </a>
-              </li>
-              <li class="sidebar-item">
-                <a href="ApprSO.html" class="sidebar-link">
-                  <i class="fa-solid fa-shop"></i>
-                  Shop Owners
-                </a>
-              </li>
-
-              <hr />
-
+                <div id="users">
+                  <div id="pending-users">
+                    <li class="sidebar-header">Pending</li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" id="pending-customer">
+                        <i class="fa-solid fa-users"></i>
+                        Customers
+                      </a>
+                    </li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" id="pending-mechanic">
+                        <i class="fa-solid fa-wrench"></i>
+                        Mechanics
+                      </a>
+                    </li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" id="pending-shop">
+                        <i class="fa-solid fa-shop"></i>
+                        Shop Owners
+                      </a>
+                    </li>
+                    <hr />
+                  </div>
+                  <!--Approved-->
+                  <div id="approved-users">
+                    <li class="sidebar-header">Approved</li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" id="approved-customer">
+                        <i class="fa-solid fa-users"></i>
+                        Customers
+                      </a>
+                    </li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" id="approved-mechanic">
+                        <i class="fa-solid fa-wrench"></i>
+                        Mechanics
+                      </a>
+                    </li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" id="approved-shop">
+                        <i class="fa-solid fa-shop"></i>
+                        Shop Owners
+                      </a>
+                    </li>
+                    <hr />
+                  </div>
+                </div>
                 <!--Admins-->
                 <li class="sidebar-link">
-                  <a href="Admins.html" class="sidebar-link">
+                  <a class="sidebar-link" id="users-admin">
                     <i class="fa-solid fa-file-pen"></i>
                     Admins
                   </a>
                 </li>
 
-              <!--Reports-->
-              <li class="sidebar-link">
-                <a href="Reports.html" class="sidebar-link">
-                  <i class="fa-solid fa-file-pen"></i>
-                  Reports
-                </b>
-              </li>
+                <!--Reports-->
+                <li class="sidebar-link">
+                  <a class="sidebar-link" id="users-reports">
+                    <i class="fa-solid fa-file-pen"></i>
+                    Reports
+                  </b>
+                </li>
 
               <!--Log Out-->
               <li class="sidebar-link">
