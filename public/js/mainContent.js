@@ -9,6 +9,8 @@ const firebaseConfig = {
   measurementId: "G-YNQ5V3JNEL",
 };
 
+console.log(window.location.href);
+
 firebase.initializeApp(firebaseConfig);
 let database = firebase.database();
 let dataRef = database.ref("users");
@@ -55,9 +57,12 @@ reportsUser.onclick = () => {
   window.open("Reports.html?user-role=" + adminRole, "_self");
 };
 
-if (adminRole != "superuser") {
+if (adminRole == "csr") {
   usersContainer.remove();
   adminUsers.remove();
+}
+
+if (adminRole == "admin L2") {
 }
 
 console.log(adminRole);
@@ -205,7 +210,7 @@ let confirmationForm = (action, userIdRef, index) => {
       'approveData("' + userIdRef + '", ' + index + ")"
     );
   }
-  if (action == "remove") {
+  if (action == "remove" || action == "terminate") {
     let rejectionMessageContainer = document.createElement("div");
     let rejectionMessage = document.createElement("textarea");
     let rejectionReason = document.createTextNode("Reason:");
@@ -215,7 +220,7 @@ let confirmationForm = (action, userIdRef, index) => {
     rejectionMessageContainer.appendChild(rejectionMessage);
     confirmationButtonConfirm.setAttribute(
       "onclick",
-      'removeData("' + userIdRef + '", ' + index + ")"
+      'removeData("' + userIdRef + '", ' + index + ", " + '"' + action + '")'
     );
     rejectionMessageContainer.style.display = "flex";
     rejectionMessageContainer.style.flexDirection = "column";
@@ -236,9 +241,10 @@ let sendEmailNotification = (userEmail, actionTaken) => {
   })();
 
   let emailParams;
-  let rejectionMessage = document.getElementById("rejectionMessage").value;
+  let rejectionMessage;
 
-  if (actionTaken == "REJECTED") {
+  if (actionTaken == "REJECTED" || actionTaken == "TERMINATED") {
+    RejectionMessage = document.getElementById("rejectionMessage").value;
     emailParams = {
       To: userEmail,
       Subject: "Your Account has been " + actionTaken,
@@ -255,14 +261,12 @@ let sendEmailNotification = (userEmail, actionTaken) => {
   } else {
     emailParams = {
       To: userEmail,
-      Subject: "Your Account has been " + actionTaken,
+      Subject:
+        "Complete Your Tap and Repair Account Verification to Get Started!",
       Body:
-        "Your Account " +
+        "Hello " +
         userEmail +
-        " has been " +
-        actionTaken +
-        ". " +
-        "If you believe there has been a mistake, please reach out to our support team for further assistance. Best regards, The Tap and Repair Application Team.",
+        ", We're excited to welcome you to Tap and Repairm Your registration has been thoroughly reviewed and approved by our administrators. To start using all the amazing features Tap and Repair has to offer, we kindly ask you to complete your account verification by clicking on the link below:",
     };
   }
 
@@ -280,8 +284,10 @@ let sendEmailNotification = (userEmail, actionTaken) => {
 };
 
 //Removed User EMail Notification
-let removeData = async (userIdRef, index) => {
+let removeData = async (userIdRef, index, removeAction) => {
   try {
+    if (removeAction == "remove") removeAction = "REJECTED";
+    if (removeAction == "terminate") removeAction = "TERMINATED";
     userIdRef = "users/" + userIdRef;
     userIdRef = database.ref(userIdRef);
 
@@ -291,8 +297,8 @@ let removeData = async (userIdRef, index) => {
     const userEmail = user.email;
 
     // Perform the email notification, data removal, and other operations
-    sendEmailNotification(userEmail, "REJECTED");
-    //await userIdRef.remove();
+    sendEmailNotification(userEmail, removeAction);
+    await userIdRef.remove();
 
     let rowItem = document.getElementById("row" + index);
     rowItem.remove();
@@ -317,7 +323,7 @@ let approveData = async (userIdRef, index) => {
     const userEmail = user.email;
 
     // Perform the email notification, data approval, and other operations
-    sendEmailNotification(userEmail, "APPROVED", "");
+    sendEmailNotification(userEmail, "APPROVED");
     await userIdRef.set(true);
 
     let rowItem = document.getElementById("row" + index);
@@ -586,7 +592,7 @@ let createRow = (rowObject, index, userId) => {
   );
   terminateButton.setAttribute(
     "onclick",
-    'confirmationForm("remove","' + userId + '",' + index + ")"
+    'confirmationForm("terminate","' + userId + '",' + index + ")"
   );
   locationButton.setAttribute("key", index);
   locationButton.setAttribute("onclick", "viewLocation(" + index + ")");
