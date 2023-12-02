@@ -165,6 +165,7 @@ let confirmationForm = (action, userIdRef, index) => {
   let confirmationText = document.createTextNode(
     "Are you sure you want to " + action + " the user?"
   );
+
   let pageContainer = document.getElementById("pageContainer");
   let confirmationContainer = document.createElement("div");
   let confirmationBackground = document.createElement("div");
@@ -179,9 +180,6 @@ let confirmationForm = (action, userIdRef, index) => {
   confirmationContainer.appendChild(confirmationBackground);
   confirmationBackground.appendChild(confirmationContents);
   confirmationContents.appendChild(confirmationText);
-  confirmationBackground.appendChild(confirmationButtonContainer);
-  confirmationButtonContainer.appendChild(confirmationButtonCancel);
-  confirmationButtonContainer.appendChild(confirmationButtonConfirm);
   confirmationButtonCancel.appendChild(cancelText);
   confirmationButtonConfirm.appendChild(confirmText);
 
@@ -208,11 +206,24 @@ let confirmationForm = (action, userIdRef, index) => {
     );
   }
   if (action == "remove") {
+    let rejectionMessageContainer = document.createElement("div");
+    let rejectionMessage = document.createElement("textarea");
+    let rejectionReason = document.createTextNode("Reason:");
+    rejectionMessage.id = "rejectionMessage";
+    confirmationBackground.appendChild(rejectionMessageContainer);
+    rejectionMessageContainer.appendChild(rejectionReason);
+    rejectionMessageContainer.appendChild(rejectionMessage);
     confirmationButtonConfirm.setAttribute(
       "onclick",
       'removeData("' + userIdRef + '", ' + index + ")"
     );
+    rejectionMessageContainer.style.display = "flex";
+    rejectionMessageContainer.style.flexDirection = "column";
   }
+
+  confirmationBackground.appendChild(confirmationButtonContainer);
+  confirmationButtonContainer.appendChild(confirmationButtonCancel);
+  confirmationButtonContainer.appendChild(confirmationButtonConfirm);
 };
 
 //E-Mail Notification
@@ -224,17 +235,36 @@ let sendEmailNotification = (userEmail, actionTaken) => {
     emailjs.init("_WBdXTRXKLOJVxBJr");
   })();
 
-  let emailParams = {
-    To: userEmail,
-    Subject: "Your Account has been " + actionTaken,
-    Body:
-      "Your Account " +
-      userEmail +
-      " has been " +
-      actionTaken +
-      ". " +
-      "If you believe there has been a mistake, please reach out to our support team for further assistance. Best regards, The Tap and Repair Application Team.",
-  };
+  let emailParams;
+  let rejectionMessage = document.getElementById("rejectionMessage").value;
+
+  if (actionTaken == "REJECTED") {
+    emailParams = {
+      To: userEmail,
+      Subject: "Your Account has been " + actionTaken,
+      Body:
+        "Your Account " +
+        userEmail +
+        " has been " +
+        actionTaken +
+        ". " +
+        'Reason: "' +
+        rejectionMessage +
+        '". If you believe there has been a mistake, please reach out to our support team for further assistance. Best regards, The Tap and Repair Application Team.',
+    };
+  } else {
+    emailParams = {
+      To: userEmail,
+      Subject: "Your Account has been " + actionTaken,
+      Body:
+        "Your Account " +
+        userEmail +
+        " has been " +
+        actionTaken +
+        ". " +
+        "If you believe there has been a mistake, please reach out to our support team for further assistance. Best regards, The Tap and Repair Application Team.",
+    };
+  }
 
   let serviceId = "service_ghy4wru";
   let templateId = "template_gfwlr6n";
@@ -262,7 +292,7 @@ let removeData = async (userIdRef, index) => {
 
     // Perform the email notification, data removal, and other operations
     sendEmailNotification(userEmail, "REJECTED");
-    await userIdRef.remove();
+    //await userIdRef.remove();
 
     let rowItem = document.getElementById("row" + index);
     rowItem.remove();
@@ -287,7 +317,7 @@ let approveData = async (userIdRef, index) => {
     const userEmail = user.email;
 
     // Perform the email notification, data approval, and other operations
-    sendEmailNotification(userEmail, "APPROVED");
+    sendEmailNotification(userEmail, "APPROVED", "");
     await userIdRef.set(true);
 
     let rowItem = document.getElementById("row" + index);
@@ -627,27 +657,51 @@ let createRow = (rowObject, index, userId) => {
 //Fetching Data
 let queryCreate = (obj, index, userId) => {
   if (dataQuery == "PendCust") {
-    if (obj.usertype == "Customer" && obj.approved == false)
+    if (
+      obj.usertype == "Customer" &&
+      obj.approved == false &&
+      obj.completed == true
+    )
       createRow(obj, index, userId);
   }
   if (dataQuery == "ApprCust") {
-    if (obj.usertype == "Customer" && obj.approved == true)
+    if (
+      obj.usertype == "Customer" &&
+      obj.approved == true &&
+      obj.completed == true
+    )
       createRow(obj, index, userId);
   }
   if (dataQuery == "PendMech") {
-    if (obj.usertype == "Mechanic" && obj.approved == false)
+    if (
+      obj.usertype == "Mechanic" &&
+      obj.approved == false &&
+      obj.completed == true
+    )
       createRow(obj, index, userId);
   }
   if (dataQuery == "ApprMech") {
-    if (obj.usertype == "Mechanic" && obj.approved == true)
+    if (
+      obj.usertype == "Mechanic" &&
+      obj.approved == true &&
+      obj.completed == true
+    )
       createRow(obj, index, userId);
   }
   if (dataQuery == "PendSO") {
-    if (obj.usertype == "Repair Shop" && obj.approved == false)
+    if (
+      obj.usertype == "Repair Shop" &&
+      obj.approved == false &&
+      obj.completed == true
+    )
       createRow(obj, index, userId);
   }
   if (dataQuery == "ApprSO") {
-    if (obj.usertype == "Repair Shop" && obj.approved == true)
+    if (
+      obj.usertype == "Repair Shop" &&
+      obj.approved == true &&
+      obj.completed == true
+    )
       createRow(obj, index, userId);
   }
 };
@@ -732,17 +786,3 @@ function signout() {
       alert(error);
     });
 }
-
-function getCurrentUser() {
-  firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-      // User is signed in.
-      console.log(user.uid);
-    } else {
-      // No user is signed in.
-      console.log("No user signed in.");
-    }
-  });
-}
-
-getCurrentUser();
