@@ -244,7 +244,7 @@ let sendEmailNotification = (userEmail, actionTaken) => {
   let rejectionMessage;
 
   if (actionTaken == "REJECTED" || actionTaken == "TERMINATED") {
-    RejectionMessage = document.getElementById("rejectionMessage").value;
+    rejectionMessage = document.getElementById("rejectionMessage").value;
     emailParams = {
       To: userEmail,
       Subject: "Your Account has been " + actionTaken,
