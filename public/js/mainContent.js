@@ -232,7 +232,7 @@ let confirmationForm = (action, userIdRef, index) => {
 };
 
 //E-Mail Notification
-let sendEmailNotification = (userEmail, actionTaken) => {
+let sendEmailNotification = (user, actionTaken) => {
   //UN: tapandrepairtar@gmail.com
   //PW: TARTARus;
   //Public Key : _WBdXTRXKLOJVxBJr
@@ -246,7 +246,7 @@ let sendEmailNotification = (userEmail, actionTaken) => {
   if (actionTaken == "REJECTED" || actionTaken == "TERMINATED") {
     rejectionMessage = document.getElementById("rejectionMessage").value;
     emailParams = {
-      To: userEmail,
+      To: user.email,
       Subject: "Your Account has been " + actionTaken,
       Body:
         "Your Account " +
@@ -260,13 +260,13 @@ let sendEmailNotification = (userEmail, actionTaken) => {
     };
   } else {
     emailParams = {
-      To: userEmail,
+      To: user.email,
       Subject:
         "Complete Your Tap and Repair Account Verification to Get Started!",
       Body:
         "Hello " +
-        userEmail +
-        ", We're excited to welcome you to Tap and Repairm Your registration has been thoroughly reviewed and approved by our administrators. To start using all the amazing features Tap and Repair has to offer, we kindly ask you to complete your account verification by clicking on the link below:",
+        user.fullname +
+        ", \n\n Welcome aboard to Tap and Repair! \n\n Your registration has been thoroughly reviewed and approved by our administrators. To activate your account and unlock the full potential of Tap and Repair's exceptional features, please keep an eye on your inbox for the verification email we've just sent.\n\n This crucial step ensures the security of your account and grants you unfettered access to Tap and Repair's comprehensive suite of repair services. From managing repair requests seamlessly to exploring diverse service options and staying updated with personalized offerings, you'll have it all at your fingertips once you verify your email. \n\n Thank you for selecting Tap and Repair. For any queries or assistance required, our dedicated support team is available round the clock at [support@tapandrepair.com]. Your satisfaction is our utmost priority! \n\n Warm regards, \n Tap and Repair Team",
     };
   }
 
@@ -294,10 +294,9 @@ let removeData = async (userIdRef, index, removeAction) => {
     // Use an async function to await the data retrieval
     const snapshot = await userIdRef.once("value");
     const user = snapshot.val();
-    const userEmail = user.email;
 
     // Perform the email notification, data removal, and other operations
-    sendEmailNotification(userEmail, removeAction);
+    sendEmailNotification(user, removeAction);
     await userIdRef.remove();
 
     let rowItem = document.getElementById("row" + index);
@@ -320,10 +319,9 @@ let approveData = async (userIdRef, index) => {
     // Use an async function to await the data retrieval
     const snapshot = await userEmailRef.once("value");
     const user = snapshot.val();
-    const userEmail = user.email;
 
     // Perform the email notification, data approval, and other operations
-    sendEmailNotification(userEmail, "APPROVED");
+    sendEmailNotification(user, "APPROVED");
     await userIdRef.set(true);
 
     let rowItem = document.getElementById("row" + index);
