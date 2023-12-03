@@ -65,11 +65,13 @@ if (adminRole == "csr") {
 if (adminRole == "admin L2") {
   pendingUsers.remove();
   adminUsers.remove();
+  reportsUser.remove();
 }
 
 if (adminRole == "admin L3") {
   approvedUsers.remove();
   adminUsers.remove();
+  reportsUser.remove();
 }
 
 // Function for Retrieving Admin Data
