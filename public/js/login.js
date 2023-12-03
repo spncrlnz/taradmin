@@ -26,7 +26,20 @@ let Login = async () => {
       let userIsAdmin = await checkAdmin(user.email);
       if (userIsAdmin) {
         let adminRole = await auditLoginCreate(user.email);
-        window.open("Reports.html?user-role=" + adminRole, "_self");
+        let roleURL;
+        if (adminRole == "csr") {
+          roleURL = "Reports.html";
+        }
+        if (adminRole == "superuser") {
+          roleURL = "Admins.html";
+        }
+        if (adminRole == "admin L2") {
+          roleURL = "ApprCust.html";
+        }
+        if (adminRole == "admin L3") {
+          roleURL = "PendCust.html";
+        }
+        window.open(roleURL + "?user-role=" + adminRole, "_self");
       } else {
         loginError();
       }
