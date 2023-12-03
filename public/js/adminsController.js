@@ -394,7 +394,16 @@ async function updateWindow() {
   let updateUpdateWindow = async () => {
     let adminForUpdateIndex = itemSelected.slice(13);
     let adminForUpdateRef = DATABASE.ref("admins/" + adminForUpdateIndex);
+    let adminLogSnapshot = await adminForUpdateRef.once("value");
+    let adminLogData = adminLogSnapshot.val();
+    adminLogData = adminLogData.logs;
+    console.log(adminLogData);
+    adminLogData[adminLogData.length] = {
+      action: "Role Update",
+      timestamp: displayTime(),
+    };
     let adminForUpdateData = {
+      logs: adminLogData,
       username: updateWindowUsernameField.value,
       role: updateWindowRoleNameField.value,
     };
