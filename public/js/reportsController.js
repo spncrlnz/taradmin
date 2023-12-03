@@ -28,6 +28,8 @@ let approvedMechanicButton = document.getElementById("approved-mechanic");
 let approvedShopButton = document.getElementById("approved-shop");
 let adminUsers = document.getElementById("users-admin");
 let reportsUser = document.getElementById("users-reports");
+let pendingUsers = document.getElementById("pending-users");
+let approvedUsers = document.getElementById("approved-users");
 
 pendingCustomerButton.onclick = () => {
   window.open("PendCust.html?user-role=" + adminRole, "_self");
@@ -54,8 +56,18 @@ reportsUser.onclick = () => {
   window.open("Reports.html?user-role=" + adminRole, "_self");
 };
 
-if (adminRole != "superuser") {
+if (adminRole == "csr") {
   usersContainer.remove();
+  adminUsers.remove();
+}
+
+if (adminRole == "admin L2") {
+  pendingUsers.remove();
+  adminUsers.remove();
+}
+
+if (adminRole == "admin L3") {
+  approvedUsers.remove();
   adminUsers.remove();
 }
 
