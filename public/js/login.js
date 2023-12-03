@@ -81,6 +81,8 @@ let auditLoginCreate = async (email) => {
   let newLogsData = {
     action: "Log-In",
     timestamp: displayTime(),
+    creator: email.toString(),
+    role: " ",
   };
   await newLogsRef.set(newLogsData);
   return adminData[adminNumber].role;

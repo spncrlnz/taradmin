@@ -71,11 +71,12 @@ if (adminRole == "admin L3") {
 const data = urlParams.get("data");
 let database = firebase.database();
 let adminRef = database.ref("admins/" + data.slice(13));
+let adminData;
 let logsData = [];
 
 let getAdminLogs = async () => {
   let adminSnapshot = await adminRef.once("value");
-  let adminData = adminSnapshot.val();
+  adminData = adminSnapshot.val();
   logsData = adminData.logs;
   for (let i = logsData.length - 1; i >= 0; i--) {
     createLogRows(i);
@@ -86,14 +87,40 @@ let createLogRows = (i) => {
   let tableContent = document.getElementById("table-content");
   let row = document.createElement("tr");
   let itemTimestamp = document.createElement("th");
+  let itemCreator = document.createElement("th");
   let itemAction = document.createElement("th");
+  let itemRole = document.createElement("th");
+  let itemEmail = document.createElement("th");
   let logTimestamp = document.createTextNode(logsData[i].timestamp);
+  let logCreator = document.createTextNode(
+    logsData[i].creator ? logsData[i].creator : ""
+  );
   let logAction = document.createTextNode(logsData[i].action);
+  let logRole = document.createTextNode(logsData[i].role);
+  let logEmail = document.createTextNode(adminData.username);
   tableContent.appendChild(row);
   row.appendChild(itemTimestamp);
+  row.appendChild(itemCreator);
   row.appendChild(itemAction);
+  row.appendChild(itemRole);
+  row.appendChild(itemEmail);
   itemTimestamp.appendChild(logTimestamp);
+  itemCreator.appendChild(logCreator);
   itemAction.appendChild(logAction);
+  itemRole.appendChild(logRole);
+  itemEmail.appendChild(logEmail);
 };
+
+function signout() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch((error) => {
+      alert(error);
+    });
+}
 
 getAdminLogs();

@@ -366,6 +366,8 @@ let createCreateWindow = async () => {
         0: {
           action: "Create",
           timestamp: displayTime(),
+          creator: firebase.auth().currentUser.email,
+          role: adminRole,
         },
       },
     };
@@ -411,10 +413,12 @@ async function updateWindow() {
     let adminLogSnapshot = await adminForUpdateRef.once("value");
     let adminLogData = adminLogSnapshot.val();
     adminLogData = adminLogData.logs;
-    console.log(adminLogData);
+    let newRole = updateWindowRoleNameField.value;
     adminLogData[adminLogData.length] = {
-      action: "Role Update",
+      action: "Update",
       timestamp: displayTime(),
+      creator: firebase.auth().currentUser.email,
+      role: newRole,
     };
     let adminForUpdateData = {
       logs: adminLogData,
