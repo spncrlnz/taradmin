@@ -9,8 +9,6 @@ const firebaseConfig = {
   measurementId: "G-YNQ5V3JNEL",
 };
 
-console.log(window.location.href);
-
 firebase.initializeApp(firebaseConfig);
 let database = firebase.database();
 let dataRef = database.ref("users");
@@ -75,8 +73,6 @@ if (adminRole == "admin L3") {
   adminUsers.remove();
   reportsUser.remove();
 }
-
-console.log(adminRole);
 
 // User Objects
 let userObject = {

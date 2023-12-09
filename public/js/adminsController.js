@@ -83,7 +83,6 @@ let GetAdminData = async () => {
   try {
     const adminSnapshot = await ADMINREF.once("value");
     let adminKeys = Object.keys(adminSnapshot.val());
-    console.log(adminKeys);
     let adminValues = adminSnapshot.val();
     for (let i = 0; i <= adminKeys[adminKeys.length - 1]; i++) {
       if (adminKeys.includes(i.toString())) {
@@ -130,7 +129,6 @@ let LoadTableRows = async () => {
       roleItem.appendChild(roleText);
       row.appendChild(checkBoxItem);
       row.appendChild(emailItem);
-      row.appendChild(fullnameItem);
       row.appendChild(roleItem);
       dataTable.appendChild(row);
     }
@@ -140,19 +138,173 @@ let LoadTableRows = async () => {
 // Top Right Buttons Controllers
 let pageContainer = document.getElementById("pageContainer");
 let createButton = document.getElementById("createButton");
+let createWithoutUserButton = document.getElementById(
+  "createWithoutUserButton"
+);
 let updateButton = document.getElementById("updateButton");
 let deleteButton = document.getElementById("deleteButton");
 let auditLogsButton = document.getElementById("auditLogs");
 
-createButton.style.marginRight = "10px";
-updateButton.style.marginRight = "10px";
-deleteButton.style.marginRight = "10px";
+createButton.style.marginRight = "15px";
+createWithoutUserButton.style.marginRight = "15px";
+updateButton.style.marginRight = "15px";
+deleteButton.style.marginRight = "15px";
 updateButton.style.color = "gray";
 deleteButton.style.color = "gray";
 auditLogsButton.style.color = "gray";
 
 createButton.style.cursor = "pointer";
+createWithoutUserButton.style.cursor = "pointer";
 createButton.onclick = createWindow;
+createWithoutUserButton.onclick = createWindowWithoutUser;
+
+function createWindowWithoutUser() {
+  let createContainer = document.createElement("div");
+  let createBackground = document.createElement("div");
+  let createUsernameContainer = document.createElement("div");
+  let createPasswordContainer = document.createElement("div");
+  let createUsernameField = document.createElement("input");
+  let createUsernameLabel = document.createTextNode("Username/Email:");
+  let createPasswordField = document.createElement("input");
+  let createPasswordLabel = document.createTextNode("Password:");
+  let createButtonContainer = document.createElement("div");
+  let createCreateButton = document.createElement("div");
+  let createCancelButton = document.createElement("div");
+  let createCreateText = document.createTextNode("CREATE");
+  let createCancelText = document.createTextNode("CANCEL");
+
+  createPasswordField.type = "password";
+
+  createContainer.style.gridArea = "overlap";
+  createContainer.style.zIndex = "99";
+  createContainer.style.height = "100vh";
+  createContainer.style.width = "100vw";
+  createContainer.style.display = "flex";
+  createContainer.style.alignItems = "center";
+  createContainer.style.justifyContent = "center";
+
+  createBackground.style.display = "flex";
+  createBackground.style.flexDirection = "column";
+  createBackground.style.width = "400px";
+  createBackground.style.height = "180px";
+  createBackground.style.backgroundColor = "black";
+  createBackground.style.borderRadius = "10px";
+  createBackground.style.padding = "20px";
+  createBackground.style.justifyContent = "center";
+
+  createUsernameContainer.style.display = "flex";
+  createUsernameContainer.style.width = "100%";
+  createUsernameContainer.style.justifyContent = "space-between";
+  createUsernameContainer.style.marginBottom = "5px";
+  createUsernameContainer.style.paddingRight = "20px";
+  createUsernameContainer.style.paddingLeft = "20px";
+
+  createPasswordContainer.style.display = "flex";
+  createPasswordContainer.style.width = "100%";
+  createPasswordContainer.style.justifyContent = "space-between";
+  createPasswordContainer.style.marginBottom = "5px";
+  createPasswordContainer.style.paddingRight = "20px";
+  createPasswordContainer.style.paddingLeft = "20px";
+
+  createButtonContainer.style.marginTop = "20px";
+  createButtonContainer.style.display = "flex";
+  createButtonContainer.style.width = "100%";
+  createButtonContainer.style.justifyContent = "space-around";
+  createCreateButton.style.cursor = "pointer";
+  createCancelButton.style.cursor = "pointer";
+
+  createUsernameContainer.appendChild(createUsernameLabel);
+  createUsernameContainer.appendChild(createUsernameField);
+  createPasswordContainer.appendChild(createPasswordLabel);
+  createPasswordContainer.appendChild(createPasswordField);
+  createCancelButton.appendChild(createCancelText);
+  createCreateButton.appendChild(createCreateText);
+  createButtonContainer.appendChild(createCancelButton);
+  createButtonContainer.appendChild(createCreateButton);
+  createBackground.appendChild(createUsernameContainer);
+  createBackground.appendChild(createPasswordContainer);
+  createBackground.appendChild(createButtonContainer);
+  createContainer.appendChild(createBackground);
+  pageContainer.appendChild(createContainer);
+
+  let closeCreateContainer = () => {
+    createContainer.remove();
+  };
+
+  let createAdminRecord = async () => {
+    let usernameVal = createUsernameField.value;
+    let passwordVal = createPasswordField.value;
+    let currentUserEmail = await firebase.auth().currentUser.email;
+    let userIndex;
+
+    for (let i = 0; i < adminData.length; i++) {
+      if (adminData[i]) {
+        if (adminData[i].username == currentUserEmail) {
+          userIndex = i;
+        }
+      }
+    }
+
+    let currentUserCreds = {
+      username: currentUserEmail,
+      password: adminData[userIndex].password,
+    };
+    let registrationSuccessful = false;
+
+    await firebase
+      .auth()
+      .createUserWithEmailAndPassword(usernameVal, passwordVal)
+      .then((userCredential) => {
+        // User signed up successfully
+        const user = userCredential.user;
+        console.log("User signed up:", user);
+        registrationSuccessful = true;
+      })
+      .catch((error) => {
+        // Handle errors here
+        console.error("Sign up error:", error.message);
+      });
+
+    await firebase
+      .auth()
+      .signInWithEmailAndPassword(
+        currentUserCreds.username,
+        currentUserCreds.password
+      )
+      .then((userCredential) => {
+        // User signed in successfully
+        const user = userCredential.user;
+        console.log("User signed in:", user);
+      })
+      .catch((error) => {
+        // Handle errors here
+        console.error("Sign in error:", error.message);
+      });
+
+    let newAdminRef = DATABASE.ref("admins/" + adminData.length);
+    let newAdminData = {
+      logs: {
+        0: {
+          action: "Create",
+          creator: firebase.auth().currentUser.email,
+          timestamp: displayTime(),
+        },
+      },
+      username: usernameVal,
+      role: "",
+      password: passwordVal,
+    };
+
+    if (registrationSuccessful) {
+      await newAdminRef.set(newAdminData);
+    }
+    closeCreateContainer();
+    GetAdminData();
+  };
+
+  createCancelButton.onclick = closeCreateContainer;
+  createCreateButton.onclick = createAdminRecord;
+}
 
 async function createWindow() {
   const usersRef = DATABASE.ref("users");
@@ -162,6 +314,7 @@ async function createWindow() {
   let usersEmails = [];
   let usersType = [];
   let usersFullname = [];
+  let usersPassowrd = [];
   let adminEmails = [];
   for (i = 0; i < adminData.length; i++) {
     if (adminData[i]) adminEmails.push(adminData[i].username);
@@ -172,6 +325,7 @@ async function createWindow() {
       usersEmails.push(usersData[i].email);
       usersType.push(usersData[i].usertype);
       usersFullname.push(usersData[i].fullname);
+      usersPassowrd.push(usersData[i].password);
     }
   }
 
@@ -360,6 +514,7 @@ let createCreateWindow = async () => {
   if (adminUsername && adminRole) {
     let createAdminRef = DATABASE.ref("admins/" + adminData.length);
     let createAdminData = {
+      password: selectedUserPassword,
       username: adminUsername,
       role: adminRole,
       logs: {
@@ -550,6 +705,8 @@ async function updateWindow() {
   updateWindowRoleDescField.value = selectedRoleDesc;
 }
 
+let selectedUserPassword;
+
 let selectEmail = async () => {
   let emailField = document.getElementById("emailField");
   let emailVal = emailField.value;
@@ -558,14 +715,17 @@ let selectEmail = async () => {
   let usersData = usersSnapshot.val();
   usersData = Object.values(usersData);
   let userEmails = [];
+  let userPasswords = [];
   for (let i = 0; i < usersData.length; i++) {
     userEmails[i] = usersData[i].email;
+    userPasswords[i] = usersData[i].password;
   }
   let nameField = document.getElementById("nameField");
   let index = userEmails.indexOf(emailVal);
   let nameVal;
   if (emailVal) {
     nameVal = usersData[index].fullname;
+    selectedUserPassword = usersData[index].password;
   } else {
     nameVal = "";
   }
