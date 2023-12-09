@@ -39,7 +39,9 @@ let Login = async () => {
         if (adminRole == "admin L3") {
           roleURL = "PendCust.html";
         }
-        window.open(roleURL + "?user-role=" + adminRole, "_self");
+        if (roleURL) {
+          window.open(roleURL + "?user-role=" + adminRole, "_self");
+        }
       } else {
         loginError();
       }
@@ -68,6 +70,11 @@ let auditLoginCreate = async (email) => {
     if (adminEmails[i] == email) {
       adminNumber = i;
     }
+  }
+  if (adminData[adminNumber].role) {
+    //do nothing
+  } else {
+    return loginError();
   }
   let adminLogsRef = database.ref("admins/" + adminNumber.toString() + "/logs");
   let adminLogsSnapshot = await adminLogsRef.once("value");
